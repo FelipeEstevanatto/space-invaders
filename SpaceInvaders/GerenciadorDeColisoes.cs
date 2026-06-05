@@ -13,21 +13,20 @@ namespace SpaceInvaders
 
         public void ChecarColisoes(Jogo jogo)
         {
-            // Em vez de limpar e repopular, vamos usar a lista que já pode conter coisas
-            // vindas do método Jogo.Atualizar()
-
-            foreach (var projetil in jogo.Projeteis.ToList())
+            // As listas só são lidas aqui; a remoção real acontece depois no Form.
+            foreach (var projetil in jogo.Projeteis)
             {
                 // Colisão: Tiro do Jogador -> Alien
                 if (projetil.EhDoJogador)
                 {
-                    foreach (var alien in jogo.Aliens.ToList())
+                    foreach (var alien in jogo.Aliens)
                     {
                         if (projetil.Sprite.Bounds.IntersectsWith(alien.Sprite.Bounds))
                         {
                             jogo.AdicionarPontos(10);
                             projeteisRemover.Add(projetil);
                             aliensRemover.Add(alien);
+                            break;
                         }
                     }
                 }
@@ -41,9 +40,6 @@ namespace SpaceInvaders
                     }
                 }
             }
-
-            // Fazer a limpeza visual e lógica
-            // (Você precisará remover os PictureBoxes do Form e os objetos das Listas)
         }
     }
 }
