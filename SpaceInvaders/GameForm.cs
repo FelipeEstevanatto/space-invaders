@@ -23,6 +23,8 @@ namespace SpaceInvaders
 
         private Label lblScore;
         private List<PictureBox> coracoesVidas;
+        private readonly Image imagemAlien = Properties.Resources.alien_png;
+        private readonly Image imagemCoracao = Properties.Resources.red_heart;
 
         // Controle para evitar que o segurar espaço crie muitos tiros ou fique engasgando
         private bool espacoPressionado;
@@ -110,7 +112,7 @@ namespace SpaceInvaders
                 pctCoracao.SizeMode = PictureBoxSizeMode.StretchImage;
 
                 // CHANGE "nome_da_imagem_do_coracao" to your actual resource name!
-                pctCoracao.Image = Properties.Resources.red_heart;
+                pctCoracao.Image = imagemCoracao;
 
                 // Position them in the top right corner, spaced out
                 int posX = this.ClientSize.Width - 40 - (i * 35);
@@ -134,16 +136,9 @@ namespace SpaceInvaders
             {
                 for (int coluna = 0; coluna < colunas; coluna++)
                 {
-                    PictureBox pctAlien = new PictureBox();
-                    pctAlien.Size = new Size(40, 40);
-                    pctAlien.BackColor = Color.Transparent;
-                    pctAlien.Image = Properties.Resources.alien_png;
-                    pctAlien.SizeMode = PictureBoxSizeMode.StretchImage;
-
-                    pctAlien.Location = new Point(margemEsquerda + (coluna * espacamentoX), margemTopo + (linha * espacamentoY));
-
-                    this.Controls.Add(pctAlien);
-                    meuJogo.Aliens.Add(new Alien(pctAlien));
+                    int x = margemEsquerda + (coluna * espacamentoX);
+                    int y = margemTopo + (linha * espacamentoY);
+                    meuJogo.Aliens.Add(new Alien(x, y));
                 }
             }
         }
@@ -169,25 +164,19 @@ namespace SpaceInvaders
                 coracoesVidas[i].Visible = i < meuJogo.Jogador.Vidas;
             }
 
-            // Remove pictureboxes of dead entities and objects from list
             foreach (var alienToRemove in gerenciadorColisoes.aliensRemover)
             {
-               this.Controls.Remove(alienToRemove.Sprite);
-               alienToRemove.Sprite.Dispose();
                meuJogo.Aliens.Remove(alienToRemove);
             }
             gerenciadorColisoes.aliensRemover.Clear();
 
             foreach(var projToRemove in gerenciadorColisoes.projeteisRemover)
             {
-               if (this.Controls.Contains(projToRemove.Sprite))
-               {
-                   this.Controls.Remove(projToRemove.Sprite);
-                   projToRemove.Sprite.Dispose();
-               }
                meuJogo.Projeteis.Remove(projToRemove);
             }
             gerenciadorColisoes.projeteisRemover.Clear();
+
+                Invalidate();
 
             // 4. Valida Condições de Vitória e Derrota
             if (meuJogo.Jogador.Vidas <= 0)
@@ -209,19 +198,11 @@ namespace SpaceInvaders
 
         private void CriarTiroJogador()
         {
-            PictureBox pctTiro = new PictureBox();
-            pctTiro.Size = new Size(5, 15);
-            pctTiro.BackColor = Color.Yellow; // Cor do tiro
-
-            // Calcula o centro da nave para o tiro sair do bico
-            int xTiro = pctShip.Location.X + (pctShip.Width / 2) - (pctTiro.Width / 2);
-            int yTiro = pctShip.Location.Y - pctTiro.Height;
-            pctTiro.Location = new Point(xTiro, yTiro);
-
-            this.Controls.Add(pctTiro); // Põe na tela
+            int xTiro = pctShip.Location.X + (pctShip.Width / 2) - (Projetil.Largura / 2);
+            int yTiro = pctShip.Location.Y - Projetil.Altura;
 
             // Registra na lógica (true significa que é tiro do jogador)
-            meuJogo.Projeteis.Add(new Projetil(xTiro, yTiro, true, pctTiro));
+            meuJogo.Projeteis.Add(new Projetil(xTiro, yTiro, true));
         }
 
         private void CriarTiroAlien(int xInicial, int yInicial)
@@ -230,16 +211,29 @@ namespace SpaceInvaders
             int tirosAtivos = meuJogo.Projeteis.Count(p => !p.EhDoJogador);
             if (tirosAtivos >= 4) return;
 
-            PictureBox pctTiro = new PictureBox();
-            pctTiro.Size = new Size(5, 15);
-            pctTiro.BackColor = Color.LimeGreen; // Cor do tiro do alien
-
-            pctTiro.Location = new Point(xInicial - (pctTiro.Width / 2), yInicial);
-
-            this.Controls.Add(pctTiro);
-
             // false significa que é tiro do inimigo
-            meuJogo.Projeteis.Add(new Projetil(pctTiro.Location.X, pctTiro.Location.Y, false, pctTiro));
+            meuJogo.Projeteis.Add(new Projetil(xInicial - (Projetil.Largura / 2), yInicial, false));
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            foreach (var alien in meuJogo?.Aliens ?? Enumerable.Empty<Alien>())
+            {
+                e.Graphics.DrawImage(imagemAlien, alien.Bounds);
+            }
+
+            if (meuJogo == null)
+            {
+                return;
+            }
+
+            foreach (var projetil in meuJogo.Projeteis)
+            {
+                Brush brush = projetil.EhDoJogador ? Brushes.Yellow : Brushes.LimeGreen;
+                e.Graphics.FillRectangle(brush, projetil.Bounds);
+            }
         }
     }
 }

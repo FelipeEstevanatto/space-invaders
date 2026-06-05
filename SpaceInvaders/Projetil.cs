@@ -14,23 +14,22 @@ namespace SpaceInvaders
         public int Y { get; private set; }
         public bool EhDoJogador { get; private set; }
         public int Velocidade { get; private set; }
-        public PictureBox Sprite { get; private set; }
+        public const int Largura = 5;
+        public const int Altura = 15;
+        public Rectangle Bounds => new Rectangle(X, Y, Largura, Altura);
 
-        public Projetil(int x, int y, bool ehDoJogador, PictureBox sprite)
+        public Projetil(int x, int y, bool ehDoJogador)
         {
             X = x;
             Y = y;
             EhDoJogador = ehDoJogador;
-            Sprite = sprite;
             Velocidade = ehDoJogador ? -15 : 10; // Sobe se for do jogador, desce se for do alien
-            Sprite.Location = new Point(X, Y);
         }
 
         // Método de comportamento
         public void Mover()
         {
             Y += Velocidade;
-            Sprite.Top = Y;
         }
     }
 }

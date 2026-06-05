@@ -21,7 +21,7 @@ namespace SpaceInvaders
                 {
                     foreach (var alien in jogo.Aliens)
                     {
-                        if (projetil.Sprite.Bounds.IntersectsWith(alien.Sprite.Bounds))
+                        if (projetil.Bounds.IntersectsWith(alien.Bounds))
                         {
                             jogo.AdicionarPontos(10);
                             projeteisRemover.Add(projetil);
@@ -33,7 +33,7 @@ namespace SpaceInvaders
                 // Colisão: Tiro do Alien -> Jogador
                 else
                 {
-                    if (projetil.Sprite.Bounds.IntersectsWith(jogo.Jogador.Sprite.Bounds))
+                    if (projetil.Bounds.IntersectsWith(jogo.Jogador.Bounds))
                     {
                         jogo.Jogador.PerderVida();
                         projeteisRemover.Add(projetil);

@@ -3,30 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace SpaceInvaders
 {
     internal class Alien
     {
-        public PictureBox Sprite { get; private set; }
+        public const int Largura = 40;
+        public const int Altura = 40;
+
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        public Rectangle Bounds => new Rectangle(X, Y, Largura, Altura);
         public int VelocidadeX { get; private set; } = 5;
 
-        public Alien(PictureBox sprite)
+        public Alien(int x, int y)
         {
-            Sprite = sprite;
+            X = x;
+            Y = y;
         }
 
         public void Mover()
         {
-            // Lógica de zigue-zague ou descida constante
-            Sprite.Left += VelocidadeX;
+            X += VelocidadeX;
         }
 
         public void InverterDirecaoEDescer()
         {
             VelocidadeX = -VelocidadeX;
-            Sprite.Top += 30; // Desce em direção ao jogador
+            Y += 30;
         }
     }
 }

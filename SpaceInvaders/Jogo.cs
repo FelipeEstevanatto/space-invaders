@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace SpaceInvaders
         public List<Alien> Aliens { get; private set; }
         public List<Projetil> Projeteis { get; private set; }
         public int Pontuacao { get; private set; } = 0;
-        private Form _tela;
+        private readonly Form _tela;
         private Random random = new Random();
 
         public Jogo(NaveJogador jogador, Form tela)
@@ -36,7 +37,7 @@ namespace SpaceInvaders
                 p.Mover();
 
                 // Destrói o projétil se sair da tela, permitindo que o jogador atire novamente
-                if (p.Sprite.Bottom < 0 || p.Sprite.Top > _tela.ClientSize.Height)
+                if (p.Y + Projetil.Altura < 0 || p.Y > _tela.ClientSize.Height)
                 {
                     gerenciadorColisoes.projeteisRemover.Add(p);
                 }
@@ -47,7 +48,7 @@ namespace SpaceInvaders
             foreach (var alien in Aliens)
             {
                 alien.Mover();
-                if (alien.Sprite.Right >= _tela.ClientSize.Width || alien.Sprite.Left <= 0)
+                if (alien.Bounds.Right >= _tela.ClientSize.Width || alien.Bounds.Left <= 0)
                 {
                     bateuNaBorda = true;
                 }
@@ -70,8 +71,8 @@ namespace SpaceInvaders
                     Alien alienAtirador = Aliens[indexSorteado];
 
                     // Calcula de onde sai o tiro
-                    int xTiro = alienAtirador.Sprite.Location.X + (alienAtirador.Sprite.Width / 2);
-                    int yTiro = alienAtirador.Sprite.Bottom;
+                    int xTiro = alienAtirador.Bounds.Left + (Alien.Largura / 2);
+                    int yTiro = alienAtirador.Bounds.Bottom;
 
                     // Avisa o Form para desenhar o tiro na tela
                     OnAlienAtirou?.Invoke(xTiro, yTiro);
