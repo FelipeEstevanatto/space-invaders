@@ -8,20 +8,20 @@ using System.Windows.Forms;
 
 namespace SpaceInvaders
 {
-    internal class Jogo
+    internal class Game
     {
-        public NaveJogador Jogador { get; private set; }
+        public PlayerShip Player { get; private set; }
         public List<Alien> Aliens { get; private set; }
-        public List<Projetil> Projeteis { get; private set; }
-        public int Pontuacao { get; private set; } = 0;
+        public List<Projectile> Projectiles { get; private set; }
+        public int Score { get; private set; } = 0;
         private readonly Form _tela;
         private Random random = new Random();
 
-        public Jogo(NaveJogador jogador, Form tela)
+        public Game(PlayerShip player, Form tela)
         {
-            Jogador = jogador;
+            Player = player;
             Aliens = new List<Alien>();
-            Projeteis = new List<Projetil>();
+            Projectiles = new List<Projectile>();
             _tela = tela;
         }
 
@@ -29,25 +29,25 @@ namespace SpaceInvaders
         public event Action<int, int> OnAlienAtirou;
 
         // Método chamado pelo Timer do Form1
-        public void Atualizar(GerenciadorDeColisoes gerenciadorColisoes)
+        public void Atualizar(CollisionManager gerenciadorColisoes)
         {
-            // 1. Mover todos os projéteis
-            foreach (var p in Projeteis)
+            // 1. Move todos os projéteis
+            foreach (var p in Projectiles)
             {
-                p.Mover();
+                p.Move();
 
-                // Destrói o projétil se sair da tela, permitindo que o jogador atire novamente
-                if (p.Y + Projetil.Altura < 0 || p.Y > _tela.ClientSize.Height)
+                // Destrói o projétil se sair da tela, permitindo que o player atire novamente
+                if (p.Y + Projectile.Altura < 0 || p.Y > _tela.ClientSize.Height)
                 {
                     gerenciadorColisoes.projeteisRemover.Add(p);
                 }
             }
 
-            // 2. Mover Aliens
+            // 2. Move Aliens
             bool bateuNaBorda = false;
             foreach (var alien in Aliens)
             {
-                alien.Mover();
+                alien.Move();
                 if (alien.Bounds.Right >= _tela.ClientSize.Width || alien.Bounds.Left <= 0)
                 {
                     bateuNaBorda = true;
@@ -71,7 +71,7 @@ namespace SpaceInvaders
                     Alien alienAtirador = Aliens[indexSorteado];
 
                     // Calcula de onde sai o tiro
-                    int xTiro = alienAtirador.Bounds.Left + (Alien.Largura / 2);
+                    int xTiro = alienAtirador.Bounds.Left + (Alien.AlienWidth / 2);
                     int yTiro = alienAtirador.Bounds.Bottom;
 
                     // Avisa o Form para desenhar o tiro na tela
@@ -81,7 +81,7 @@ namespace SpaceInvaders
         }
         public void AdicionarPontos(int pontos)
         {
-            Pontuacao += pontos;
+            Score += pontos;
         }
     }
 }

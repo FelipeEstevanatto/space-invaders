@@ -13,8 +13,8 @@ namespace SpaceInvaders
     public partial class GameForm : Form
     {
         // Declaração dos nossos objetos (Associação)
-        private Jogo meuJogo;
-        private GerenciadorDeColisoes gerenciadorColisoes;
+        private Game myGame;
+        private CollisionManager gerenciadorColisoes;
         private Timer gameTimer;
 
         // Controles de movimentação contínua
@@ -44,12 +44,12 @@ namespace SpaceInvaders
             if (e.KeyCode == Keys.Right || e.KeyCode == Keys.D)
                 indoDireita = true;
 
-            // Disparo do jogador (Garante que só atira uma vez por aperto de tecla)
+            // Disparo do player (Garante que só atira uma vez por aperto de tecla)
             if (e.KeyCode == Keys.Space && !espacoPressionado)
             {
                 espacoPressionado = true;
                 // Limita a 3 tiros simultâneos na tela para evitar "metralhadora"
-                int tirosAtivos = meuJogo.Projeteis.Count(p => p.EhDoJogador);
+                int tirosAtivos = myGame.Projectiles.Count(p => p.IsFromPlayer);
                 if (tirosAtivos < 3)
                 {
                     CriarTiroJogador();
@@ -71,18 +71,18 @@ namespace SpaceInvaders
 
         private void GameForm_Load(object sender, EventArgs e)
         {
-            // Instancia a nave do jogador a partir da posição do PictureBox do designer
-            NaveJogador jogador = new NaveJogador(pctShip.Location.X, pctShip.Location.Y);
+            // Instancia a nave do player a partir da posição do PictureBox do designer
+            PlayerShip player = new PlayerShip(pctShip.Location.X, pctShip.Location.Y);
             // O desenho ficará por nossa conta agora; escondemos o controle do designer
             pctShip.Visible = false;
 
             // Instancia o motor do jogo e o gerenciador de colisões
-            meuJogo = new Jogo(jogador, this);
-            meuJogo.OnAlienAtirou += CriarTiroAlien;
-            gerenciadorColisoes = new GerenciadorDeColisoes();
+            myGame = new Game(player, this);
+            myGame.OnAlienAtirou += CriarTiroAlien;
+            gerenciadorColisoes = new CollisionManager();
 
             // Gera a matriz 3x5 de alienígenas obrigatória do escopo
-            GerarInimigos();
+            GenerateEnemies();
 
             // NEW: Call the method to draw the UI
             CriarInterfaceDeUsuario();
@@ -105,7 +105,7 @@ namespace SpaceInvaders
             lblScore.Location = new Point(10, 10); // Top left corner
             this.Controls.Add(lblScore);
 
-            // 2. Create the 3 Heart Images dynamically
+            // 2. Create the 3 Heart Images
             coracoesVidas = new List<PictureBox>();
             for (int i = 0; i < 3; i++)
             {
@@ -114,10 +114,9 @@ namespace SpaceInvaders
                 pctCoracao.BackColor = Color.Transparent;
                 pctCoracao.SizeMode = PictureBoxSizeMode.StretchImage;
 
-                // CHANGE "nome_da_imagem_do_coracao" to your actual resource name!
                 pctCoracao.Image = imagemCoracao;
 
-                // Position them in the top right corner, spaced out
+                // Top right corner, spaced out
                 int posX = this.ClientSize.Width - 40 - (i * 35);
                 pctCoracao.Location = new Point(posX, 10);
 
@@ -126,7 +125,7 @@ namespace SpaceInvaders
             }
         }
 
-        private void GerarInimigos()
+        private void GenerateEnemies()
         {
             int colunas = 5;
             int linhas = 3;
@@ -141,57 +140,57 @@ namespace SpaceInvaders
                 {
                     int x = margemEsquerda + (coluna * espacamentoX);
                     int y = margemTopo + (linha * espacamentoY);
-                    meuJogo.Aliens.Add(new Alien(x, y));
+                    myGame.Aliens.Add(new Alien(x, y));
                 }
             }
         }
 
         private void timerClock_Tick(object sender, EventArgs e)
         {
-            // 1. Movimenta o Jogador de forma suave
-            if (indoEsquerda) meuJogo.Jogador.MoverEsquerda();
-            if (indoDireita) meuJogo.Jogador.MoverDireita(this.ClientSize.Width);
+            // 1. Movimenta o Player de forma suave
+            if (indoEsquerda) myGame.Player.MoveLeft();
+            if (indoDireita) myGame.Player.MoveRight(this.ClientSize.Width);
 
             // 2. Atualiza a posição de tiros e aliens
-            meuJogo.Atualizar(gerenciadorColisoes);
+            myGame.Atualizar(gerenciadorColisoes);
 
             // 3. Checa quem bateu em quem (e passa o Form para remover imagens da tela)
-            gerenciadorColisoes.ChecarColisoes(meuJogo);
+            gerenciadorColisoes.ChecarColisoes(myGame);
 
-            lblScore.Text = "Score: " + meuJogo.Pontuacao;
+            lblScore.Text = "Score: " + myGame.Score;
 
             // NEW: Update the Hearts based on the player's remaining lives
             // If they have 2 lives, only index 0 and 1 remain visible.
             for (int i = 0; i < coracoesVidas.Count; i++)
             {
-                coracoesVidas[i].Visible = i < meuJogo.Jogador.Vidas;
+                coracoesVidas[i].Visible = i < myGame.Player.Vidas;
             }
 
             foreach (var alienToRemove in gerenciadorColisoes.aliensRemover)
             {
-               meuJogo.Aliens.Remove(alienToRemove);
+               myGame.Aliens.Remove(alienToRemove);
             }
             gerenciadorColisoes.aliensRemover.Clear();
 
             foreach(var projToRemove in gerenciadorColisoes.projeteisRemover)
             {
-               meuJogo.Projeteis.Remove(projToRemove);
+               myGame.Projectiles.Remove(projToRemove);
             }
             gerenciadorColisoes.projeteisRemover.Clear();
 
                 Invalidate();
 
             // 4. Valida Condições de Vitória e Derrota
-            if (meuJogo.Jogador.Vidas <= 0)
+            if (myGame.Player.Vidas <= 0)
             {
                 gameTimer.Stop();
-                MessageBox.Show($"GAME OVER! Score final: {meuJogo.Pontuacao}", "Derrota");
+                MessageBox.Show($"GAME OVER! Score final: {myGame.Score}", "Derrota");
                 Application.Exit();
             }
-            else if (meuJogo.Aliens.Count == 0)
+            else if (myGame.Aliens.Count == 0)
             {
                 gameTimer.Stop();
-                MessageBox.Show($"VITÓRIA! Score final: {meuJogo.Pontuacao}", "Vitória");
+                MessageBox.Show($"VITÓRIA! Score final: {myGame.Score}", "Vitória");
                 Application.Exit();
             }
         }
@@ -201,44 +200,44 @@ namespace SpaceInvaders
 
         private void CriarTiroJogador()
         {
-            var shipBounds = meuJogo.Jogador.Bounds;
-            int xTiro = shipBounds.Left + (shipBounds.Width / 2) - (Projetil.Largura / 2);
-            int yTiro = shipBounds.Top - Projetil.Altura;
+            var shipBounds = myGame.Player.Bounds;
+            int xTiro = shipBounds.Left + (shipBounds.Width / 2) - (Projectile.Largura / 2);
+            int yTiro = shipBounds.Top - Projectile.Altura;
 
-            // Registra na lógica (true significa que é tiro do jogador)
-            meuJogo.Projeteis.Add(new Projetil(xTiro, yTiro, true));
+            // Registra na lógica (true significa que é tiro do player)
+            myGame.Projectiles.Add(new Projectile(xTiro, yTiro, true));
         }
 
         private void CriarTiroAlien(int xInicial, int yInicial)
         {
             // Limita a quantidade de tiros dos aliens na tela ao mesmo tempo também (opcional)
-            int tirosAtivos = meuJogo.Projeteis.Count(p => !p.EhDoJogador);
+            int tirosAtivos = myGame.Projectiles.Count(p => !p.IsFromPlayer);
             if (tirosAtivos >= 4) return;
 
             // false significa que é tiro do inimigo
-            meuJogo.Projeteis.Add(new Projetil(xInicial - (Projetil.Largura / 2), yInicial, false));
+            myGame.Projectiles.Add(new Projectile(xInicial - (Projectile.Largura / 2), yInicial, false));
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
 
-            foreach (var alien in meuJogo?.Aliens ?? Enumerable.Empty<Alien>())
+            foreach (var alien in myGame?.Aliens ?? Enumerable.Empty<Alien>())
             {
                 e.Graphics.DrawImage(imagemAlien, alien.Bounds);
             }
 
-            if (meuJogo == null)
+            if (myGame == null)
             {
                 return;
             }
 
-            // Desenha a nave do jogador
-            e.Graphics.DrawImage(imagemNave, meuJogo.Jogador.Bounds);
+            // Desenha a nave do player
+            e.Graphics.DrawImage(imagemNave, myGame.Player.Bounds);
 
-            foreach (var projetil in meuJogo.Projeteis)
+            foreach (var projetil in myGame.Projectiles)
             {
-                Brush brush = projetil.EhDoJogador ? Brushes.Yellow : Brushes.LimeGreen;
+                Brush brush = projetil.IsFromPlayer ? Brushes.Yellow : Brushes.LimeGreen;
                 e.Graphics.FillRectangle(brush, projetil.Bounds);
             }
         }

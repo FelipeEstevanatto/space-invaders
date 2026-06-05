@@ -53,11 +53,11 @@
     <Compile Include="GameForm.Designer.cs">
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GerenciadorDeColisoes.cs" />
-    <Compile Include="Jogo.cs" />
-    <Compile Include="NaveJogador.cs" />
+    <Compile Include="CollisionManager.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="PlayerShip.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Projetil.cs" />
+    <Compile Include="Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
@@ -86,10 +86,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\QUICO-removebg-preview.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\1945907.png" />
+    <None Include="Resources\player_ship.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

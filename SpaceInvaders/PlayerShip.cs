@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
@@ -10,7 +8,7 @@ using System.Drawing;
 
 namespace SpaceInvaders
 {
-    internal class NaveJogador
+    internal class PlayerShip
     {
         public int Vidas { get; private set; } = 3;
 
@@ -22,19 +20,19 @@ namespace SpaceInvaders
 
         public int Velocidade { get; private set; } = 10;
 
-        public NaveJogador(int x, int y)
+        public PlayerShip(int x, int y)
         {
             X = x;
             Y = y;
         }
 
-        public void MoverEsquerda()
+        public void MoveLeft()
         {
             if (X > 0)
                 X -= Velocidade;
         }
 
-        public void MoverDireita(int limiteTela)
+        public void MoveRight(int limiteTela)
         {
             if (X + Largura < limiteTela)
                 X += Velocidade;

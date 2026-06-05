@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace SpaceInvaders
 {
-    internal class GerenciadorDeColisoes
+    internal class CollisionManager
     {
-        public List<Projetil> projeteisRemover = new List<Projetil>();
+        public List<Projectile> projeteisRemover = new List<Projectile>();
         public List<Alien> aliensRemover = new List<Alien>();
 
-        public void ChecarColisoes(Jogo jogo)
+        public void ChecarColisoes(Game jogo)
         {
             // As listas só são lidas aqui; a remoção real acontece depois no Form.
-            foreach (var projetil in jogo.Projeteis)
+            foreach (var projetil in jogo.Projectiles)
             {
-                // Colisão: Tiro do Jogador -> Alien
-                if (projetil.EhDoJogador)
+                // Colisão: Tiro do Player -> Alien
+                if (projetil.IsFromPlayer)
                 {
                     foreach (var alien in jogo.Aliens)
                     {
@@ -30,12 +30,12 @@ namespace SpaceInvaders
                         }
                     }
                 }
-                // Colisão: Tiro do Alien -> Jogador
+                // Colisão: Tiro do Alien -> Player
                 else
                 {
-                    if (projetil.Bounds.IntersectsWith(jogo.Jogador.Bounds))
+                    if (projetil.Bounds.IntersectsWith(jogo.Player.Bounds))
                     {
-                        jogo.Jogador.PerderVida();
+                        jogo.Player.PerderVida();
                         projeteisRemover.Add(projetil);
                     }
                 }

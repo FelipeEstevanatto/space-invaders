@@ -10,12 +10,12 @@ namespace SpaceInvaders
 {
     internal class Alien
     {
-        public const int Largura = 40;
-        public const int Altura = 40;
+        public const int AlienWidth = 40;
+        public const int AlienHeight = 40;
 
         public int X { get; private set; }
         public int Y { get; private set; }
-        public Rectangle Bounds => new Rectangle(X, Y, Largura, Altura);
+        public Rectangle Bounds => new Rectangle(X, Y, AlienWidth, AlienHeight);
         public int VelocidadeX { get; private set; } = 5;
 
         public Alien(int x, int y)
@@ -24,7 +24,7 @@ namespace SpaceInvaders
             Y = y;
         }
 
-        public void Mover()
+        public void Move()
         {
             X += VelocidadeX;
         }
