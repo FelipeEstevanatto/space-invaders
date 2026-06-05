@@ -25,6 +25,7 @@ namespace SpaceInvaders
         private List<PictureBox> coracoesVidas;
         private readonly Image imagemAlien = Properties.Resources.alien_png;
         private readonly Image imagemCoracao = Properties.Resources.red_heart;
+        private readonly Image imagemNave = Properties.Resources.nave_png;
 
         // Controle para evitar que o segurar espaço crie muitos tiros ou fique engasgando
         private bool espacoPressionado;
@@ -70,8 +71,10 @@ namespace SpaceInvaders
 
         private void GameForm_Load(object sender, EventArgs e)
         {
-            // Instancia a nave do jogador passando o PictureBox que já está na tela
-            NaveJogador jogador = new NaveJogador(pctShip);
+            // Instancia a nave do jogador a partir da posição do PictureBox do designer
+            NaveJogador jogador = new NaveJogador(pctShip.Location.X, pctShip.Location.Y);
+            // O desenho ficará por nossa conta agora; escondemos o controle do designer
+            pctShip.Visible = false;
 
             // Instancia o motor do jogo e o gerenciador de colisões
             meuJogo = new Jogo(jogador, this);
@@ -198,8 +201,9 @@ namespace SpaceInvaders
 
         private void CriarTiroJogador()
         {
-            int xTiro = pctShip.Location.X + (pctShip.Width / 2) - (Projetil.Largura / 2);
-            int yTiro = pctShip.Location.Y - Projetil.Altura;
+            var shipBounds = meuJogo.Jogador.Bounds;
+            int xTiro = shipBounds.Left + (shipBounds.Width / 2) - (Projetil.Largura / 2);
+            int yTiro = shipBounds.Top - Projetil.Altura;
 
             // Registra na lógica (true significa que é tiro do jogador)
             meuJogo.Projeteis.Add(new Projetil(xTiro, yTiro, true));
@@ -228,6 +232,9 @@ namespace SpaceInvaders
             {
                 return;
             }
+
+            // Desenha a nave do jogador
+            e.Graphics.DrawImage(imagemNave, meuJogo.Jogador.Bounds);
 
             foreach (var projetil in meuJogo.Projeteis)
             {

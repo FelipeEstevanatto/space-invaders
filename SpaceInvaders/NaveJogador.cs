@@ -5,30 +5,39 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
+using System;
+using System.Drawing;
 
 namespace SpaceInvaders
 {
     internal class NaveJogador
     {
         public int Vidas { get; private set; } = 3;
-        public PictureBox Sprite { get; private set; }
+
+        public int X { get; private set; }
+        public int Y { get; private set; }
+
+        public const int Largura = 157;
+        public const int Altura = 112;
+
         public int Velocidade { get; private set; } = 10;
 
-        public NaveJogador(PictureBox sprite)
+        public NaveJogador(int x, int y)
         {
-            Sprite = sprite;
+            X = x;
+            Y = y;
         }
 
         public void MoverEsquerda()
         {
-            if (Sprite.Left > 0)
-                Sprite.Left -= Velocidade;
+            if (X > 0)
+                X -= Velocidade;
         }
 
         public void MoverDireita(int limiteTela)
         {
-            if (Sprite.Right < limiteTela)
-                Sprite.Left += Velocidade;
+            if (X + Largura < limiteTela)
+                X += Velocidade;
         }
 
         public void PerderVida()
@@ -36,6 +45,6 @@ namespace SpaceInvaders
             Vidas--;
         }
 
-        public Rectangle Bounds => Sprite.Bounds;
+        public Rectangle Bounds => new Rectangle(X, Y, Largura, Altura);
     }
 }
