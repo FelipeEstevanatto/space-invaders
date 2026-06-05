@@ -195,9 +195,6 @@ namespace SpaceInvaders
             }
         }
 
-        // (Removido daqui e passado para baixo, para juntar se quiser)
-
-
         private void CreatePlayerProjectile()
         {
             var shipBounds = myGame.Player.Bounds;
