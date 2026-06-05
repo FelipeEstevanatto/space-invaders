@@ -28,16 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.timerClock = new System.Windows.Forms.Timer(this.components);
             this.pctShip = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pctShip)).BeginInit();
             this.SuspendLayout();
-            // 
-            // timerClock
-            // 
-            this.timerClock.Interval = 16;
-            this.timerClock.Tick += new System.EventHandler(this.timerClock_Tick);
             // 
             // pctShip
             // 
@@ -71,6 +64,5 @@
         #endregion
 
         private System.Windows.Forms.PictureBox pctShip;
-        private System.Windows.Forms.Timer timerClock;
     }
 }

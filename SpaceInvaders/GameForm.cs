@@ -84,7 +84,7 @@ namespace SpaceInvaders
 
             // Configura o Game Loop (O coração do jogo)
             gameTimer = new Timer();
-            gameTimer.Interval = 20; // Roda a ~50 FPS (Quadros por segundo)
+            gameTimer.Interval = 16; // Roda a ~60 FPS (Quadros por segundo)
             gameTimer.Tick += timerClock_Tick;
             gameTimer.Start();
         }
