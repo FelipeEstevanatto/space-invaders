@@ -29,7 +29,7 @@ namespace SpaceInvaders
             X += VelocidadeX;
         }
 
-        public void InverterDirecaoEDescer()
+        public void ReverseDirectionAndDescend()
         {
             VelocidadeX = -VelocidadeX;
             Y += 30;

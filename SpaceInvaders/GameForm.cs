@@ -14,18 +14,18 @@ namespace SpaceInvaders
     {
         // Declaração dos nossos objetos (Associação)
         private Game myGame;
-        private CollisionManager gerenciadorColisoes;
+        private CollisionManager collisionManager;
         private Timer gameTimer;
 
         // Controles de movimentação contínua
-        private bool indoEsquerda;
-        private bool indoDireita;
+        private bool goingLeft;
+        private bool goingRight;
 
         private Label lblScore;
-        private List<PictureBox> coracoesVidas;
+        private List<PictureBox> heartLives;
         private readonly Image imagemAlien = Properties.Resources.alien_png;
         private readonly Image imagemCoracao = Properties.Resources.red_heart;
-        private readonly Image imagemNave = Properties.Resources.nave_png;
+        private readonly Image shipImage = Properties.Resources.nave_png;
 
         // Controle para evitar que o segurar espaço crie muitos tiros ou fique engasgando
         private bool espacoPressionado;
@@ -39,20 +39,20 @@ namespace SpaceInvaders
         {
             // Aceita setas ou A/D conforme requisito
             if (e.KeyCode == Keys.Left || e.KeyCode == Keys.A)
-                indoEsquerda = true;
+                goingLeft = true;
 
             if (e.KeyCode == Keys.Right || e.KeyCode == Keys.D)
-                indoDireita = true;
+                goingRight = true;
 
             // Disparo do player (Garante que só atira uma vez por aperto de tecla)
             if (e.KeyCode == Keys.Space && !espacoPressionado)
             {
                 espacoPressionado = true;
-                // Limita a 3 tiros simultâneos na tela para evitar "metralhadora"
+                // Limita a 3 tiros simultâneos na screen para evitar "metralhadora"
                 int tirosAtivos = myGame.Projectiles.Count(p => p.IsFromPlayer);
                 if (tirosAtivos < 3)
                 {
-                    CriarTiroJogador();
+                    CreatePlayerProjectile();
                 }
             }
         }
@@ -60,10 +60,10 @@ namespace SpaceInvaders
         private void GameForm_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Left || e.KeyCode == Keys.A)
-                indoEsquerda = false;
+                goingLeft = false;
 
             if (e.KeyCode == Keys.Right || e.KeyCode == Keys.D)
-                indoDireita = false;
+                goingRight = false;
 
             if (e.KeyCode == Keys.Space)
                 espacoPressionado = false;
@@ -78,14 +78,14 @@ namespace SpaceInvaders
 
             // Instancia o motor do jogo e o gerenciador de colisões
             myGame = new Game(player, this);
-            myGame.OnAlienAtirou += CriarTiroAlien;
-            gerenciadorColisoes = new CollisionManager();
+            myGame.OnAlienShot += CreateAlienProjectile;
+            collisionManager = new CollisionManager();
 
             // Gera a matriz 3x5 de alienígenas obrigatória do escopo
             GenerateEnemies();
 
             // NEW: Call the method to draw the UI
-            CriarInterfaceDeUsuario();
+            CreateUserInterface();
 
             // Configura o Game Loop (O coração do jogo)
             gameTimer = new Timer();
@@ -94,7 +94,7 @@ namespace SpaceInvaders
             gameTimer.Start();
         }
 
-        private void CriarInterfaceDeUsuario()
+        private void CreateUserInterface()
         {
             // 1. Create the Score Label dynamically
             lblScore = new Label();
@@ -106,22 +106,22 @@ namespace SpaceInvaders
             this.Controls.Add(lblScore);
 
             // 2. Create the 3 Heart Images
-            coracoesVidas = new List<PictureBox>();
+            heartLives = new List<PictureBox>();
             for (int i = 0; i < 3; i++)
             {
-                PictureBox pctCoracao = new PictureBox();
-                pctCoracao.Size = new Size(30, 30);
-                pctCoracao.BackColor = Color.Transparent;
-                pctCoracao.SizeMode = PictureBoxSizeMode.StretchImage;
+                PictureBox pctHeart = new PictureBox();
+                pctHeart.Size = new Size(30, 30);
+                pctHeart.BackColor = Color.Transparent;
+                pctHeart.SizeMode = PictureBoxSizeMode.StretchImage;
 
-                pctCoracao.Image = imagemCoracao;
+                pctHeart.Image = imagemCoracao;
 
                 // Top right corner, spaced out
                 int posX = this.ClientSize.Width - 40 - (i * 35);
-                pctCoracao.Location = new Point(posX, 10);
+                pctHeart.Location = new Point(posX, 10);
 
-                this.Controls.Add(pctCoracao);
-                coracoesVidas.Add(pctCoracao);
+                this.Controls.Add(pctHeart);
+                heartLives.Add(pctHeart);
             }
         }
 
@@ -148,40 +148,40 @@ namespace SpaceInvaders
         private void timerClock_Tick(object sender, EventArgs e)
         {
             // 1. Movimenta o Player de forma suave
-            if (indoEsquerda) myGame.Player.MoveLeft();
-            if (indoDireita) myGame.Player.MoveRight(this.ClientSize.Width);
+            if (goingLeft) myGame.Player.MoveLeft();
+            if (goingRight) myGame.Player.MoveRight(this.ClientSize.Width);
 
             // 2. Atualiza a posição de tiros e aliens
-            myGame.Atualizar(gerenciadorColisoes);
+            myGame.Update(collisionManager);
 
-            // 3. Checa quem bateu em quem (e passa o Form para remover imagens da tela)
-            gerenciadorColisoes.ChecarColisoes(myGame);
+            // 3. Checa quem bateu em quem (e passa o Form para remover imagens da screen)
+            collisionManager.ChecarColisoes(myGame);
 
             lblScore.Text = "Score: " + myGame.Score;
 
             // NEW: Update the Hearts based on the player's remaining lives
             // If they have 2 lives, only index 0 and 1 remain visible.
-            for (int i = 0; i < coracoesVidas.Count; i++)
+            for (int i = 0; i < heartLives.Count; i++)
             {
-                coracoesVidas[i].Visible = i < myGame.Player.Vidas;
+                heartLives[i].Visible = i < myGame.Player.Lives;
             }
 
-            foreach (var alienToRemove in gerenciadorColisoes.aliensRemover)
+            foreach (var alienToRemove in collisionManager.removeAliens)
             {
                myGame.Aliens.Remove(alienToRemove);
             }
-            gerenciadorColisoes.aliensRemover.Clear();
+            collisionManager.removeAliens.Clear();
 
-            foreach(var projToRemove in gerenciadorColisoes.projeteisRemover)
+            foreach(var projToRemove in collisionManager.removeProjectiles)
             {
                myGame.Projectiles.Remove(projToRemove);
             }
-            gerenciadorColisoes.projeteisRemover.Clear();
+            collisionManager.removeProjectiles.Clear();
 
-                Invalidate();
+            Invalidate();
 
             // 4. Valida Condições de Vitória e Derrota
-            if (myGame.Player.Vidas <= 0)
+            if (myGame.Player.Lives <= 0)
             {
                 gameTimer.Stop();
                 MessageBox.Show($"GAME OVER! Score final: {myGame.Score}", "Derrota");
@@ -198,24 +198,24 @@ namespace SpaceInvaders
         // (Removido daqui e passado para baixo, para juntar se quiser)
 
 
-        private void CriarTiroJogador()
+        private void CreatePlayerProjectile()
         {
             var shipBounds = myGame.Player.Bounds;
-            int xTiro = shipBounds.Left + (shipBounds.Width / 2) - (Projectile.Largura / 2);
-            int yTiro = shipBounds.Top - Projectile.Altura;
+            int xTiro = shipBounds.Left + (shipBounds.Width / 2) - (Projectile.Width / 2);
+            int yTiro = shipBounds.Top - Projectile.Height;
 
             // Registra na lógica (true significa que é tiro do player)
             myGame.Projectiles.Add(new Projectile(xTiro, yTiro, true));
         }
 
-        private void CriarTiroAlien(int xInicial, int yInicial)
+        private void CreateAlienProjectile(int xInicial, int yInicial)
         {
-            // Limita a quantidade de tiros dos aliens na tela ao mesmo tempo também (opcional)
+            // Limita a quantidade de tiros dos aliens na screen ao mesmo tempo também (opcional)
             int tirosAtivos = myGame.Projectiles.Count(p => !p.IsFromPlayer);
             if (tirosAtivos >= 4) return;
 
             // false significa que é tiro do inimigo
-            myGame.Projectiles.Add(new Projectile(xInicial - (Projectile.Largura / 2), yInicial, false));
+            myGame.Projectiles.Add(new Projectile(xInicial - (Projectile.Width / 2), yInicial, false));
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -233,12 +233,12 @@ namespace SpaceInvaders
             }
 
             // Desenha a nave do player
-            e.Graphics.DrawImage(imagemNave, myGame.Player.Bounds);
+            e.Graphics.DrawImage(shipImage, myGame.Player.Bounds);
 
-            foreach (var projetil in myGame.Projectiles)
+            foreach (var projectile in myGame.Projectiles)
             {
-                Brush brush = projetil.IsFromPlayer ? Brushes.Yellow : Brushes.LimeGreen;
-                e.Graphics.FillRectangle(brush, projetil.Bounds);
+                Brush brush = projectile.IsFromPlayer ? Brushes.Yellow : Brushes.LimeGreen;
+                e.Graphics.FillRectangle(brush, projectile.Bounds);
             }
         }
     }

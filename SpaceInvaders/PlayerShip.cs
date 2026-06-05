@@ -10,15 +10,15 @@ namespace SpaceInvaders
 {
     internal class PlayerShip
     {
-        public int Vidas { get; private set; } = 3;
+        public int Lives { get; private set; } = 3;
 
         public int X { get; private set; }
         public int Y { get; private set; }
 
-        public const int Largura = 157;
-        public const int Altura = 112;
+        public const int Width = 157;
+        public const int Height = 112;
 
-        public int Velocidade { get; private set; } = 10;
+        public int Speed { get; private set; } = 10;
 
         public PlayerShip(int x, int y)
         {
@@ -29,20 +29,20 @@ namespace SpaceInvaders
         public void MoveLeft()
         {
             if (X > 0)
-                X -= Velocidade;
+                X -= Speed;
         }
 
         public void MoveRight(int limiteTela)
         {
-            if (X + Largura < limiteTela)
-                X += Velocidade;
+            if (X + Width < limiteTela)
+                X += Speed;
         }
 
-        public void PerderVida()
+        public void LoseLife()
         {
-            Vidas--;
+            Lives--;
         }
 
-        public Rectangle Bounds => new Rectangle(X, Y, Largura, Altura);
+        public Rectangle Bounds => new Rectangle(X, Y, Width, Height);
     }
 }
