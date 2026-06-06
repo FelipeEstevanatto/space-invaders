@@ -30,11 +30,19 @@ namespace SpaceInvaders
 
             effectPools = new Dictionary<SoundEffectType, Queue<MediaPlayer>>();
             effectUris = new Dictionary<SoundEffectType, Uri>();
+        }
 
-            LoadEffect(SoundEffectType.Shoot, "iceball.wav", 8);
-            LoadEffect(SoundEffectType.AlienDestroyed, "rlaunch.wav", 8);
-            LoadEffect(SoundEffectType.PlayerHit, "iceball.wav", 4);
-            LoadEffect(SoundEffectType.GameOver, "iceball.wav", 2);
+        public void LoadEffects()
+        {
+            if (effectPools.Count > 0)
+            {
+                return;
+            }
+
+            LoadEffect(SoundEffectType.Shoot, "shoot.wav", 8);
+            LoadEffect(SoundEffectType.AlienDestroyed, "explosion.wav", 8);
+            LoadEffect(SoundEffectType.PlayerHit, "explosion.wav", 4);
+            LoadEffect(SoundEffectType.GameOver, "explosion.wav", 2);
         }
 
         public void PlayMusic(string fileName)
