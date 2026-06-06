@@ -28,7 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.soundIcon = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.soundIcon)).BeginInit();
             this.SuspendLayout();
+            // 
+            // soundIcon
+            // 
+            this.soundIcon.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.soundIcon.BackgroundImage = global::SpaceInvaders.Properties.Resources.sound_icon;
+            this.soundIcon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.soundIcon.Location = new System.Drawing.Point(849, 12);
+            this.soundIcon.Name = "soundIcon";
+            this.soundIcon.Size = new System.Drawing.Size(49, 42);
+            this.soundIcon.TabIndex = 1;
+            this.soundIcon.TabStop = false;
+            this.soundIcon.Click += new System.EventHandler(this.soundIcon_Click);
             // 
             // GameForm
             // 
@@ -36,15 +50,18 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Desktop;
             this.ClientSize = new System.Drawing.Size(910, 501);
+            this.Controls.Add(this.soundIcon);
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.Name = "GameForm";
             this.Text = "Space Invaders";
             this.Load += new System.EventHandler(this.GameForm_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.soundIcon)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
+        private System.Windows.Forms.PictureBox soundIcon;
     }
 }

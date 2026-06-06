@@ -83,6 +83,16 @@ namespace SpaceInvaders.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap mute_icon {
+            get {
+                object obj = ResourceManager.GetObject("mute_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap nave_png {
             get {
                 object obj = ResourceManager.GetObject("nave_png", resourceCulture);
@@ -96,6 +106,16 @@ namespace SpaceInvaders.Properties {
         internal static System.Drawing.Bitmap red_heart {
             get {
                 object obj = ResourceManager.GetObject("red_heart", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sound_icon {
+            get {
+                object obj = ResourceManager.GetObject("sound_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
