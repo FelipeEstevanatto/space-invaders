@@ -33,6 +33,7 @@ namespace SpaceInvaders
 
         public int Score { get; private set; }
         public int Lives { get; private set; }
+        private int currentLevel = 1;
 
         public Game()
         {
@@ -321,7 +322,7 @@ namespace SpaceInvaders
             Alien shooter = activeAliens[random.Next(activeAliens.Count)];
             projectiles.Add(shooter.CreateProjectile());
 
-            alienShootCooldown = random.Next(45, 90);
+            alienShootCooldown = random.Next(25, 90);
         }
 
         private void RemoveInactiveObjects(Size viewportSize)
@@ -356,6 +357,7 @@ namespace SpaceInvaders
 
             if (aliens.Count == 0)
             {
+                currentLevel++;
                 CreateAliens(viewportSize);
                 alienDirection = 1;
             }
@@ -385,8 +387,19 @@ namespace SpaceInvaders
 
         private void DrawHud(Graphics graphics)
         {
-            string text = "Score: " + Score + "    Lives: " + Lives + "    Space: Shoot    A/D or Arrows: Move    R: Restart";
-            graphics.DrawString(text, SystemFonts.DefaultFont, Brushes.White, 10, 10);
+            Rectangle hudArea = new Rectangle(0, 0, 520, 28);
+
+            using (Brush backgroundBrush = new SolidBrush(Color.FromArgb(150, 0, 0, 0)))
+            {
+                graphics.FillRectangle(backgroundBrush, hudArea);
+            }
+
+            string text = $"Score: {Score}    Lives: {Lives}    Level: {currentLevel}    Space: Shoot    A/D or Arrows: Move    R: Restart";
+
+            using (Font font = new Font("Consolas", 9, FontStyle.Bold))
+            {
+                graphics.DrawString(text, font, Brushes.White, 6, 7);
+            }
         }
 
         private void DrawGameOver(Graphics graphics, Size viewportSize)
