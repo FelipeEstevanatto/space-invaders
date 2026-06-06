@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
+using SpaceInvaders;
 
 namespace SpaceInvaders
 {
@@ -15,7 +16,7 @@ namespace SpaceInvaders
     {
         // Declaração dos nossos objetos (Associação)
         private Game game;
-        private MediaPlayer _mediaPlayer;
+        private AudioManager audioManager;
         private bool _isPaused = false;
 
 
@@ -30,6 +31,12 @@ namespace SpaceInvaders
             game = new Game();
             game.SetViewPort(ClientSize);
 
+            audioManager = new AudioManager();
+            audioManager.PlayMusic("keygen.wav");
+            audioManager.SetEffectsVolume(0.05f); // Ajusta o volume dos efeitos sonoros
+
+            game.SoundEffectRequested += AudioManager_PlayEffect;
+
             Resize += GameForm_Resize;
 
             // create new timer
@@ -38,33 +45,11 @@ namespace SpaceInvaders
             gameTimer.Tick += GameTimer_Tick;
             gameTimer.Start();
 
-            // 2. Garanta que o objeto seja criado (evita o NullReferenceException)
-            if (_mediaPlayer == null)
-            {
-                _mediaPlayer = new MediaPlayer();
-            }
-
-            // 3. Aponte para a pasta Resources combinando com o caminho absoluto
-            string caminhoRelativo = System.IO.Path.Combine("Resources", "keygen.wav");
-            string caminhoAbsoluto = System.IO.Path.GetFullPath(caminhoRelativo);
-
-            // 4. Configure e toque o arquivo
-            _mediaPlayer.Open(new Uri(caminhoAbsoluto));
-            _mediaPlayer.Volume = 0.2;
-            // Garante que o evento está associado (remova antes para não duplicar se chamar o método várias vezes)
-            _mediaPlayer.MediaEnded -= MediaPlayer_MediaEnded;
-            _mediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
-
-            _mediaPlayer.Play();
-
-            _isPaused = false;
         }
 
-        private void MediaPlayer_MediaEnded(object sender, EventArgs e)
+        private void AudioManager_PlayEffect(SoundEffectType effectType)
         {
-            // Reset the track position to the beginning and play again
-            _mediaPlayer.Position = TimeSpan.Zero;
-            _mediaPlayer.Play();
+            audioManager.PlayEffect(effectType);
         }
 
         private void GameForm_Load(object sender, EventArgs e)
@@ -118,13 +103,13 @@ namespace SpaceInvaders
         {
             if (_isPaused)
             {
-                _mediaPlayer.Play();
+                audioManager.PlayMusic("keygen.wav");
                 _isPaused = false;
                 soundIcon.BackgroundImage = Properties.Resources.sound_icon;
             }
             else
             {
-                _mediaPlayer.Pause();
+                audioManager.ToggleMute();
                 _isPaused = true;
                 soundIcon.BackgroundImage = Properties.Resources.mute_icon;
             }

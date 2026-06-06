@@ -12,6 +12,7 @@ namespace SpaceInvaders
         private PlayerShip player;
         private readonly List<Alien> aliens;
         private readonly List<Projectile> projectiles;
+        public event Action<SoundEffectType> SoundEffectRequested;
 
         private bool initialized;
         private bool movingLeft;
@@ -43,6 +44,14 @@ namespace SpaceInvaders
             Score = 0;
 
             player = new PlayerShip(0, 0);
+        }
+
+        private void RequestSound(SoundEffectType effectType)
+        {
+            if (SoundEffectRequested != null)
+            {
+                SoundEffectRequested(effectType);
+            }
         }
 
         public void SetViewPort(Size size)
@@ -208,6 +217,8 @@ namespace SpaceInvaders
 
             projectiles.Add(player.CreateProjectile());
             shootCooldown = PlayerShootCooldownMax;
+
+            RequestSound(SoundEffectType.Shoot);
         }
 
         private void UpdateProjectiles()
@@ -315,6 +326,7 @@ namespace SpaceInvaders
         private void OnAlienDestroyed(Alien alien)
         {
             Score += 10;
+            RequestSound(SoundEffectType.AlienDestroyed);
         }
 
         private void OnPlayerHit()
