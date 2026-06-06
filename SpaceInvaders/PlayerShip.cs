@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using SpaceInvaders;
 
 namespace SpaceInvaders
@@ -38,43 +39,28 @@ namespace SpaceInvaders
 
         public void ClampToBounds(Size viewportSize)
         {
-            int maxX = viewportSize.Width - Bounds.Width;
-            int maxY = viewportSize.Height - Bounds.Height;
+            int maxX = Math.Max(0, viewportSize.Width - Bounds.Width);
+            int maxY = Math.Max(0, viewportSize.Height - Bounds.Height);
 
-            if (maxX < 0)
-            {
-                maxX = 0;
-            }
-
-            if (maxY < 0)
-            {
-                maxY = 0;
-            }
-
-            int x = Bounds.X;
-            int y = Bounds.Y;
-
-            if (x < 0)
-            {
-                x = 0;
-            }
-
-            if (x > maxX)
-            {
-                x = maxX;
-            }
-
-            if (y < 0)
-            {
-                y = 0;
-            }
-
-            if (y > maxY)
-            {
-                y = maxY;
-            }
+            int x = Clamp(Bounds.X, 0, maxX);
+            int y = Clamp(Bounds.Y, 0, maxY);
 
             Bounds = new Rectangle(x, y, Bounds.Width, Bounds.Height);
+        }
+
+        private static int Clamp(int value, int min, int max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
         }
 
         public Projectile CreateProjectile()

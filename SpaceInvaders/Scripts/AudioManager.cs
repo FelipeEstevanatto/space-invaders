@@ -41,7 +41,7 @@ namespace SpaceInvaders
 
             LoadEffect(SoundEffectType.Shoot, "shoot.wav", 8);
             LoadEffect(SoundEffectType.AlienDestroyed, "explosion.wav", 8);
-            LoadEffect(SoundEffectType.PlayerHit, "explosion.wav", 4);
+            LoadEffect(SoundEffectType.PlayerHit, "player_hit.wav", 4);
             LoadEffect(SoundEffectType.GameOver, "explosion.wav", 2);
         }
 
@@ -81,7 +81,7 @@ namespace SpaceInvaders
             MediaPlayer player = pool.Dequeue();
 
             player.Stop();
-            player.Volume = isMuted ? 0 : MusicVolume;
+            player.Volume = isMuted ? 0 : EffectsVolume;
             player.Position = TimeSpan.Zero;
             player.Play();
 

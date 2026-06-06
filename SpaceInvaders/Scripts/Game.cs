@@ -15,10 +15,10 @@ namespace SpaceInvaders
         public event Action<SoundEffectType> SoundEffectRequested;
         private readonly List<Explosion> explosions;
 
-        private bool initialized;
-        private bool movingLeft;
-        private bool movingRight;
-        private bool shooting;
+        private bool isInitialized;
+        private bool isMovingLeft;
+        private bool isMovingRight;
+        private bool isShooting;
         private Size viewportSize;
 
         private int shootCooldown;
@@ -28,9 +28,9 @@ namespace SpaceInvaders
         private bool gameOver;
         private bool gameWon;
 
-        private const int PlayerShootCooldownMax = 15;
-        private const int AlienMoveSpeed = 2;
-        private const int AlienDropDistance = 18;
+        private const int PlayerShootCooldownMax = GameSettings.PlayerShootCooldown;
+        private const int AlienMoveSpeed = GameSettings.AlienBaseSpeed;
+        private const int AlienDropDistance = GameSettings.AlienDropDistance;
 
         public int Score { get; private set; }
         public int Lives { get; private set; }
@@ -44,7 +44,7 @@ namespace SpaceInvaders
             explosions = new List<Explosion>();
 
             alienDirection = 1;
-            Lives = 3;
+            Lives = GameSettings.InitialLives;
             Score = 0;
 
             player = new PlayerShip(0, 0);
@@ -69,17 +69,17 @@ namespace SpaceInvaders
         {
             if (key == Keys.Left || key == Keys.A)
             {
-                movingLeft = true;
+                isMovingLeft = true;
             }
 
             if (key == Keys.Right || key == Keys.D)
             {
-                movingRight = true;
+                isMovingRight = true;
             }
 
             if (key == Keys.Space)
             {
-                shooting = true;
+                isShooting = true;
             }
 
             if (key == Keys.R && (gameOver || gameWon))
@@ -92,17 +92,17 @@ namespace SpaceInvaders
         {
             if (key == Keys.Left || key == Keys.A)
             {
-                movingLeft = false;
+                isMovingLeft = false;
             }
 
             if (key == Keys.Right || key == Keys.D)
             {
-                movingRight = false;
+                isMovingRight = false;
             }
 
             if (key == Keys.Space)
             {
-                shooting = false;
+                isShooting = false;
             }
         }
 
@@ -196,7 +196,7 @@ namespace SpaceInvaders
                 System.Drawing.Drawing2D.PixelOffsetMode.Half;
             //graphics.Clear(Color.Black);
 
-            if (!initialized)
+            if (!isInitialized)
             {
                 return;
             }
@@ -255,7 +255,7 @@ namespace SpaceInvaders
 
         private void EnsureInitialized(Size viewportSize)
         {
-            if (initialized)
+            if (isInitialized)
             {
                 return;
             }
@@ -266,25 +266,25 @@ namespace SpaceInvaders
             player = new PlayerShip(playerX, playerY);
             CreateAliens(viewportSize);
 
-            alienShootCooldown = 60;
-            initialized = true;
+            alienShootCooldown = GameSettings.InitialAlienShootCooldown;
+            isInitialized = true;
         }
 
         private void HandlePlayerInput(Size viewportSize)
         {
-            if (movingLeft)
+            if (isMovingLeft)
             {
                 player.MoveLeft();
             }
 
-            if (movingRight)
+            if (isMovingRight)
             {
                 player.MoveRight();
             }
 
             player.ClampToBounds(viewportSize);
 
-            if (shooting)
+            if (isShooting)
             {
                 TryShoot();
             }
@@ -375,7 +375,7 @@ namespace SpaceInvaders
             Alien shooter = activeAliens[random.Next(activeAliens.Count)];
             projectiles.Add(shooter.CreateProjectile());
 
-            alienShootCooldown = random.Next(25, 90);
+            alienShootCooldown = random.Next(GameSettings.AlienShootCooldownMin, GameSettings.AlienShootCooldownMax);
         }
 
         private void RemoveInactiveObjects(Size viewportSize)
@@ -435,7 +435,7 @@ namespace SpaceInvaders
         {
             Lives--;
 
-            // RequestSound(SoundEffectType.PlayerHit);
+            RequestSound(SoundEffectType.PlayerHit);
             explosions.Add(new Explosion(player.Bounds));
 
             if (Lives <= 0)
@@ -480,10 +480,10 @@ namespace SpaceInvaders
         {
             aliens.Clear();
 
-            const int rows = 4;
-            const int columns = 8;
-            const int spacingX = 14;
-            const int spacingY = 14;
+            const int rows = GameSettings.AlienRows;
+            const int columns = GameSettings.AlienColumns;
+            const int spacingX = GameSettings.AlienSpacingX;
+            const int spacingY = GameSettings.AlienSpacingY;
 
             int totalWidth =
                 columns * Alien.DefaultWidth +
@@ -506,18 +506,18 @@ namespace SpaceInvaders
 
         private void Reset()
         {
-            initialized = false;
-            movingLeft = false;
-            movingRight = false;
-            shooting = false;
+            isInitialized = false;
+            isMovingLeft = false;
+            isMovingRight = false;
+            isShooting = false;
             shootCooldown = 0;
-            alienShootCooldown = 60;
+            alienShootCooldown = GameSettings.InitialAlienShootCooldown;
             alienDirection = 1;
             gameOver = false;
             gameWon = false;
             currentLevel = 1;
             Score = 0;
-            Lives = 3;
+            Lives = GameSettings.InitialLives;
 
             aliens.Clear();
             projectiles.Clear();

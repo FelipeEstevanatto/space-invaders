@@ -16,12 +16,14 @@ namespace SpaceInvaders
             ResolvePlayerProjectileAlienCollisions(
                 aliens,
                 projectiles,
-                alienDestroyed);
+                alienDestroyed
+            );
 
             ResolveAlienProjectilePlayerCollisions(
                 player,
                 projectiles,
-                playerHit);
+                playerHit
+            );
         }
 
         private static void ResolvePlayerProjectileAlienCollisions(

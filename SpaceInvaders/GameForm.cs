@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Media;
-using SpaceInvaders;
 using Color = System.Drawing.Color;
 
 namespace SpaceInvaders
@@ -25,7 +17,7 @@ namespace SpaceInvaders
         private Button exitButton;
         private Label titleLabel;
 
-        private bool gameStarted = false;
+        private bool isGameStarted = false;
 
 
         public GameForm()
@@ -40,7 +32,7 @@ namespace SpaceInvaders
 
             // create new timer
             gameTimer = new Timer();
-            gameTimer.Interval = 16; // Aproximadamente 60 FPS
+            gameTimer.Interval = GameSettings.TimerIntervalMs;
             gameTimer.Tick += GameTimer_Tick;
             gameTimer.Start();
 
@@ -102,7 +94,7 @@ namespace SpaceInvaders
         }
         private void AudioManager_PlayEffect(SoundEffectType effectType)
         {
-            if (!gameStarted)
+            if (!isGameStarted)
             {
                 return;
             }
@@ -126,7 +118,7 @@ namespace SpaceInvaders
 
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-            if (!gameStarted)
+            if (!isGameStarted)
             {
                 return;
             }
@@ -137,7 +129,7 @@ namespace SpaceInvaders
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            if (!gameStarted)
+            if (!isGameStarted)
             {
                 return;
             }
@@ -148,7 +140,7 @@ namespace SpaceInvaders
         {
             base.OnKeyDown(e);
 
-            if (!gameStarted)
+            if (!isGameStarted)
             {
                 if (e.KeyCode == Keys.Enter)
                 {
@@ -171,7 +163,7 @@ namespace SpaceInvaders
         {
             base.OnKeyUp(e);
 
-            if (!gameStarted)
+            if (!isGameStarted)
             {
                 return;
             }
@@ -203,7 +195,7 @@ namespace SpaceInvaders
 
         private void StartButton_Click(object sender, EventArgs e)
         {
-            gameStarted = true;
+            isGameStarted = true;
 
             game = new Game();
             game.SetViewPort(ClientSize);
@@ -224,6 +216,21 @@ namespace SpaceInvaders
         private void ExitButton_Click(object sender, EventArgs e)
         {
             Close();
+        }
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            if (gameTimer != null)
+            {
+                gameTimer.Stop();
+                gameTimer.Dispose();
+            }
+
+            if (audioManager != null)
+            {
+                audioManager.Dispose();
+            }
+
+            base.OnFormClosed(e);
         }
     }
 }
