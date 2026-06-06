@@ -32,8 +32,8 @@ namespace SpaceInvaders
             game.SetViewPort(ClientSize);
 
             audioManager = new AudioManager();
-            audioManager.PlayMusic("keygen.wav");
             audioManager.SetEffectsVolume(0.05f); // Ajusta o volume dos efeitos sonoros
+            audioManager.PlayMusic("keygen.wav");
 
             game.SoundEffectRequested += AudioManager_PlayEffect;
 
