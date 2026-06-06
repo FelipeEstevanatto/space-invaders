@@ -7,7 +7,11 @@ namespace SpaceInvaders
     {
         public const int DefaultWidth = 36;
         public const int DefaultHeight = 24;
-
+        private static readonly Image AlienImage = CreateScaledImage(
+            Properties.Resources.alien_png,
+            DefaultWidth,
+            DefaultHeight
+        );
         public Rectangle Bounds { get; private set; }
         public bool IsActive { get; set; }
 
@@ -38,6 +42,24 @@ namespace SpaceInvaders
                 ProjectileOwner.Alien);
         }
 
+        private static Bitmap CreateScaledImage(Image source, int width, int height)
+        {
+            Bitmap bitmap = new Bitmap(width, height);
+
+            using (Graphics graphics = Graphics.FromImage(bitmap))
+            {
+                graphics.InterpolationMode =
+                    System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+
+                graphics.PixelOffsetMode =
+                    System.Drawing.Drawing2D.PixelOffsetMode.Half;
+
+                graphics.DrawImage(source, 0, 0, width, height);
+            }
+
+            return bitmap;
+        }
+
         public void Draw(Graphics graphics)
         {
             if (!IsActive)
@@ -45,23 +67,7 @@ namespace SpaceInvaders
                 return;
             }
 
-            graphics.FillRectangle(Brushes.LimeGreen, Bounds);
-
-            int eyeSize = 4;
-
-            graphics.FillRectangle(
-                Brushes.Black,
-                Bounds.X + 8,
-                Bounds.Y + 7,
-                eyeSize,
-                eyeSize);
-
-            graphics.FillRectangle(
-                Brushes.Black,
-                Bounds.Right - 12,
-                Bounds.Y + 7,
-                eyeSize,
-                eyeSize);
+            graphics.DrawImageUnscaled(AlienImage, Bounds.X, Bounds.Y);
         }
     }
 }

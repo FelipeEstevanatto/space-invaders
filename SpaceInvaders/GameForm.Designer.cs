@@ -28,19 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pctShip = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pctShip)).BeginInit();
             this.SuspendLayout();
-            // 
-            // pctShip
-            // 
-            this.pctShip.BackgroundImage = global::SpaceInvaders.Properties.Resources.nave_png;
-            this.pctShip.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pctShip.Location = new System.Drawing.Point(367, 377);
-            this.pctShip.Name = "pctShip";
-            this.pctShip.Size = new System.Drawing.Size(157, 112);
-            this.pctShip.TabIndex = 0;
-            this.pctShip.TabStop = false;
             // 
             // GameForm
             // 
@@ -48,19 +36,15 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Desktop;
             this.ClientSize = new System.Drawing.Size(910, 501);
-            this.Controls.Add(this.pctShip);
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.Name = "GameForm";
             this.Text = "Space Invaders";
             this.Load += new System.EventHandler(this.GameForm_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pctShip)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.PictureBox pctShip;
     }
 }

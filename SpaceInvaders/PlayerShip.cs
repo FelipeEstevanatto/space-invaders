@@ -5,8 +5,8 @@ namespace SpaceInvaders
 {
     public class PlayerShip
     {
-        public const int DefaultWidth = 50;
-        public const int DefaultHeight = 24;
+        public const int DefaultWidth = 80;
+        public const int DefaultHeight = 40;
 
         private const int Speed = 6;
 
@@ -91,16 +91,7 @@ namespace SpaceInvaders
 
         public void Draw(Graphics graphics)
         {
-            graphics.FillRectangle(Brushes.DeepSkyBlue, Bounds);
-
-            Point[] nose =
-            {
-                new Point(Bounds.X + Bounds.Width / 2, Bounds.Y - 10),
-                new Point(Bounds.X + 8, Bounds.Y + 6),
-                new Point(Bounds.Right - 8, Bounds.Y + 6)
-            };
-
-            graphics.FillPolygon(Brushes.DeepSkyBlue, nose);
+            graphics.DrawImage(Properties.Resources.nave_png, Bounds);
         }
     }
 }
