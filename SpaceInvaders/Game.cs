@@ -1,87 +1,397 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using SpaceInvaders;
 
 namespace SpaceInvaders
 {
-    internal class Game
+    public class Game
     {
-        public PlayerShip Player { get; private set; }
-        public List<Alien> Aliens { get; private set; }
-        public List<Projectile> Projectiles { get; private set; }
-        public int Score { get; private set; } = 0;
-        private readonly Form _screen;
-        private Random random = new Random();
+        private readonly Random random;
 
-        public Game(PlayerShip player, Form screen)
+        private PlayerShip player;
+        private readonly List<Alien> aliens;
+        private readonly List<Projectile> projectiles;
+
+        private bool initialized;
+        private bool movingLeft;
+        private bool movingRight;
+        private bool shooting;
+        private Size viewportSize;
+
+        private int shootCooldown;
+        private int alienShootCooldown;
+        private int alienDirection;
+
+        private bool gameOver;
+
+        private const int PlayerShootCooldownMax = 15;
+        private const int AlienMoveSpeed = 2;
+        private const int AlienDropDistance = 18;
+
+        public int Score { get; private set; }
+        public int Lives { get; private set; }
+
+        public Game()
         {
-            Player = player;
-            Aliens = new List<Alien>();
-            Projectiles = new List<Projectile>();
-            _screen = screen;
+            random = new Random();
+            aliens = new List<Alien>();
+            projectiles = new List<Projectile>();
+
+            alienDirection = 1;
+            Lives = 3;
+            Score = 0;
+
+            player = new PlayerShip(0, 0);
         }
 
-        // Evento para avisar o form que um alien quer atirar
-        public event Action<int, int> OnAlienShot;
-
-        // Método chamado pelo Timer do Form1
-        public void Update(CollisionManager collisionManager)
+        public void SetViewPort(Size size)
         {
-            // 1. Move todos os projéteis
-            foreach (var p in Projectiles)
-            {
-                p.Move();
+            viewportSize = size;
 
-                // Destrói o projétil se sair da screen, permitindo que o player atire novamente
-                if (p.Y + Projectile.Height < 0 || p.Y > _screen.ClientSize.Height)
+            player.ClampToBounds(viewportSize);
+        }
+
+        public void KeyDown(Keys key)
+        {
+            if (key == Keys.Left || key == Keys.A)
+            {
+                movingLeft = true;
+            }
+
+            if (key == Keys.Right || key == Keys.D)
+            {
+                movingRight = true;
+            }
+
+            if (key == Keys.Space)
+            {
+                shooting = true;
+            }
+
+            if (key == Keys.R && gameOver)
+            {
+                Reset();
+            }
+        }
+
+        public void KeyUp(Keys key)
+        {
+            if (key == Keys.Left || key == Keys.A)
+            {
+                movingLeft = false;
+            }
+
+            if (key == Keys.Right || key == Keys.D)
+            {
+                movingRight = false;
+            }
+
+            if (key == Keys.Space)
+            {
+                shooting = false;
+            }
+        }
+
+        public void Update(Size viewportSize)
+        {
+            if (viewportSize.Width <= 0 || viewportSize.Height <= 0)
+            {
+                return;
+            }
+
+            EnsureInitialized(viewportSize);
+
+            if (gameOver)
+            {
+                return;
+            }
+
+            HandlePlayerInput(viewportSize);
+            UpdateAliens(viewportSize);
+            UpdateAlienShooting();
+            UpdateProjectiles();
+
+            CollisionManager.Resolve(
+                player,
+                aliens,
+                projectiles,
+                OnAlienDestroyed,
+                OnPlayerHit);
+
+            RemoveInactiveObjects(viewportSize);
+            CheckGameState(viewportSize);
+
+            if (shootCooldown > 0)
+            {
+                shootCooldown--;
+            }
+
+            if (alienShootCooldown > 0)
+            {
+                alienShootCooldown--;
+            }
+        }
+
+        public void Draw(Graphics graphics, Size viewportSize)
+        {
+            graphics.Clear(Color.Black);
+
+            if (!initialized)
+            {
+                return;
+            }
+
+            player.Draw(graphics);
+
+            foreach (Alien alien in aliens)
+            {
+                alien.Draw(graphics);
+            }
+
+            foreach (Projectile projectile in projectiles)
+            {
+                projectile.Draw(graphics);
+            }
+
+            DrawHud(graphics);
+
+            if (gameOver)
+            {
+                DrawGameOver(graphics, viewportSize);
+            }
+        }
+
+        private void EnsureInitialized(Size viewportSize)
+        {
+            if (initialized)
+            {
+                return;
+            }
+
+            int playerX = viewportSize.Width / 2 - PlayerShip.DefaultWidth / 2;
+            int playerY = viewportSize.Height - PlayerShip.DefaultHeight - 30;
+
+            player = new PlayerShip(playerX, playerY);
+            CreateAliens(viewportSize);
+
+            alienShootCooldown = 60;
+            initialized = true;
+        }
+
+        private void HandlePlayerInput(Size viewportSize)
+        {
+            if (movingLeft)
+            {
+                player.MoveLeft();
+            }
+
+            if (movingRight)
+            {
+                player.MoveRight();
+            }
+
+            player.ClampToBounds(viewportSize);
+
+            if (shooting)
+            {
+                TryShoot();
+            }
+        }
+
+        private void TryShoot()
+        {
+            if (shootCooldown > 0)
+            {
+                return;
+            }
+
+            projectiles.Add(player.CreateProjectile());
+            shootCooldown = PlayerShootCooldownMax;
+        }
+
+        private void UpdateProjectiles()
+        {
+            foreach (Projectile projectile in projectiles)
+            {
+                projectile.Update();
+            }
+        }
+
+        private void UpdateAliens(Size viewportSize)
+        {
+            bool shouldDrop = false;
+
+            foreach (Alien alien in aliens)
+            {
+                if (!alien.IsActive)
                 {
-                    collisionManager.removeProjectiles.Add(p);
+                    continue;
+                }
+
+                int nextX = alien.Bounds.X + AlienMoveSpeed * alienDirection;
+
+                if (nextX < 0 || nextX + alien.Bounds.Width > viewportSize.Width)
+                {
+                    shouldDrop = true;
+                    break;
                 }
             }
 
-            // 2. Move Aliens
-            bool hasHitEdge = false;
-            foreach (var alien in Aliens)
+            if (shouldDrop)
             {
-                alien.Move();
-                if (alien.Bounds.Right >= _screen.ClientSize.Width || alien.Bounds.Left <= 0)
+                alienDirection *= -1;
+
+                foreach (Alien alien in aliens)
                 {
-                    hasHitEdge = true;
+                    alien.Move(0, AlienDropDistance);
                 }
             }
-
-            if (hasHitEdge)
+            else
             {
-                foreach (var alien in Aliens)
-                    alien.ReverseDirectionAndDescend();
-            }
-
-            // Lógica de tiro aleatório dos aliens
-            if (Aliens.Count > 0)
-            {
-                // Verifica tempo (por ex. a cada frame tem 2% de chance de um alien atirar)
-                if (random.Next(0, 100) < 2)
+                foreach (Alien alien in aliens)
                 {
-                    // Sorteia um alien para atirar
-                    int randomIndex = random.Next(0, Aliens.Count);
-                    Alien alienShooter = Aliens[randomIndex];
-
-                    // Calcula de onde sai o tiro
-                    int xTiro = alienShooter.Bounds.Left + (Alien.AlienWidth / 2);
-                    int yTiro = alienShooter.Bounds.Bottom;
-
-                    // Avisa o Form para desenhar o tiro na screen
-                    OnAlienShot?.Invoke(xTiro, yTiro);
+                    alien.Move(AlienMoveSpeed * alienDirection, 0);
                 }
             }
         }
-        public void AddPoints(int points)
+
+        private void UpdateAlienShooting()
         {
-            Score += points;
+            if (alienShootCooldown > 0)
+            {
+                return;
+            }
+
+            List<Alien> activeAliens = new List<Alien>();
+
+            foreach (Alien alien in aliens)
+            {
+                if (alien.IsActive)
+                {
+                    activeAliens.Add(alien);
+                }
+            }
+
+            if (activeAliens.Count == 0)
+            {
+                return;
+            }
+
+            Alien shooter = activeAliens[random.Next(activeAliens.Count)];
+            projectiles.Add(shooter.CreateProjectile());
+
+            alienShootCooldown = random.Next(45, 90);
+        }
+
+        private void RemoveInactiveObjects(Size viewportSize)
+        {
+            projectiles.RemoveAll(projectile =>
+                !projectile.IsActive ||
+                projectile.Bounds.Bottom < 0 ||
+                projectile.Bounds.Top > viewportSize.Height);
+
+            aliens.RemoveAll(alien => !alien.IsActive);
+        }
+
+        private void CheckGameState(Size viewportSize)
+        {
+            foreach (Alien alien in aliens)
+            {
+                if (alien.Bounds.Bottom >= player.Bounds.Top)
+                {
+                    gameOver = true;
+                    return;
+                }
+            }
+
+            if (aliens.Count == 0)
+            {
+                CreateAliens(viewportSize);
+                alienDirection = 1;
+            }
+        }
+
+        private void OnAlienDestroyed(Alien alien)
+        {
+            Score += 10;
+        }
+
+        private void OnPlayerHit()
+        {
+            Lives--;
+
+            if (Lives <= 0)
+            {
+                gameOver = true;
+            }
+        }
+
+        private void DrawHud(Graphics graphics)
+        {
+            string text = "Score: " + Score + "    Lives: " + Lives + "    Space: Shoot    A/D or Arrows: Move    R: Restart";
+            graphics.DrawString(text, SystemFonts.DefaultFont, Brushes.White, 10, 10);
+        }
+
+        private void DrawGameOver(Graphics graphics, Size viewportSize)
+        {
+            string text = "GAME OVER - Press R to restart";
+
+            using (Font font = new Font(FontFamily.GenericSansSerif, 20, FontStyle.Bold))
+            {
+                SizeF size = graphics.MeasureString(text, font);
+
+                float x = viewportSize.Width / 2f - size.Width / 2f;
+                float y = viewportSize.Height / 2f - size.Height / 2f;
+
+                graphics.DrawString(text, font, Brushes.White, x, y);
+            }
+        }
+
+        private void CreateAliens(Size viewportSize)
+        {
+            aliens.Clear();
+
+            const int rows = 4;
+            const int columns = 8;
+            const int spacingX = 14;
+            const int spacingY = 14;
+
+            int totalWidth =
+                columns * Alien.DefaultWidth +
+                (columns - 1) * spacingX;
+
+            int startX = Math.Max(20, viewportSize.Width / 2 - totalWidth / 2);
+            int startY = 50;
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int column = 0; column < columns; column++)
+                {
+                    int x = startX + column * (Alien.DefaultWidth + spacingX);
+                    int y = startY + row * (Alien.DefaultHeight + spacingY);
+
+                    aliens.Add(new Alien(x, y));
+                }
+            }
+        }
+
+        private void Reset()
+        {
+            initialized = false;
+            movingLeft = false;
+            movingRight = false;
+            shooting = false;
+            shootCooldown = 0;
+            alienShootCooldown = 60;
+            alienDirection = 1;
+            gameOver = false;
+            Score = 0;
+            Lives = 3;
+
+            aliens.Clear();
+            projectiles.Clear();
         }
     }
 }

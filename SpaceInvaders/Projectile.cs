@@ -1,33 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Drawing;
 
 namespace SpaceInvaders
 {
-    internal class Projectile
+    public enum ProjectileOwner
     {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public bool IsFromPlayer { get; private set; }
-        public int Speed { get; private set; }
-        public const int Width = 5;
-        public const int Height = 15;
-        public Rectangle Bounds => new Rectangle(X, Y, Width, Height);
+        Player,
+        Alien
+    }
 
-        public Projectile(int x, int y, bool isFromPlayer)
+    public class Projectile
+    {
+        public const int DefaultWidth = 4;
+        public const int DefaultHeight = 12;
+
+        private readonly int speedY;
+
+        public Rectangle Bounds { get; private set; }
+        public ProjectileOwner Owner { get; private set; }
+        public bool IsActive { get; set; }
+
+        public Projectile(int x, int y, int speedY, ProjectileOwner owner)
         {
-            X = x;
-            Y = y;
-            IsFromPlayer = isFromPlayer;
-            Speed = isFromPlayer ? -15 : 10; // Sobe se for do player, desce se for do alien
+            this.speedY = speedY;
+
+            Bounds = new Rectangle(x, y, DefaultWidth, DefaultHeight);
+            Owner = owner;
+            IsActive = true;
         }
 
-        // Método de comportamento
-        public void Move()
+        public void Update()
         {
-            Y += Speed;
+            Bounds = new Rectangle(
+                Bounds.X,
+                Bounds.Y + speedY,
+                Bounds.Width,
+                Bounds.Height);
+        }
+
+        public void Draw(Graphics graphics)
+        {
+            if (!IsActive)
+            {
+                return;
+            }
+
+            Brush brush = Owner == ProjectileOwner.Player
+                ? Brushes.White
+                : Brushes.Red;
+
+            graphics.FillRectangle(brush, Bounds);
         }
     }
 }

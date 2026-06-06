@@ -1,43 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SpaceInvaders;
 
 namespace SpaceInvaders
 {
-    internal class CollisionManager
+    public static class CollisionManager
     {
-        public List<Projectile> removeProjectiles = new List<Projectile>();
-        public List<Alien> removeAliens = new List<Alien>();
-
-        public void ChecarColisoes(Game jogo)
+        public static void Resolve(
+            PlayerShip player,
+            List<Alien> aliens,
+            List<Projectile> projectiles,
+            Action<Alien> alienDestroyed,
+            Action playerHit)
         {
-            // As listas só são lidas aqui; a remoção real acontece depois no Form.
-            foreach (var projectile in jogo.Projectiles)
+            ResolvePlayerProjectileAlienCollisions(
+                aliens,
+                projectiles,
+                alienDestroyed);
+
+            ResolveAlienProjectilePlayerCollisions(
+                player,
+                projectiles,
+                playerHit);
+        }
+
+        private static void ResolvePlayerProjectileAlienCollisions(
+            List<Alien> aliens,
+            List<Projectile> projectiles,
+            Action<Alien> alienDestroyed)
+        {
+            foreach (Projectile projectile in projectiles)
             {
-                // Colisão: Tiro do Player -> Alien
-                if (projectile.IsFromPlayer)
+                if (!projectile.IsActive ||
+                    projectile.Owner != ProjectileOwner.Player)
                 {
-                    foreach (var alien in jogo.Aliens)
+                    continue;
+                }
+
+                foreach (Alien alien in aliens)
+                {
+                    if (!alien.IsActive)
                     {
-                        if (projectile.Bounds.IntersectsWith(alien.Bounds))
-                        {
-                            jogo.AddPoints(10);
-                            removeProjectiles.Add(projectile);
-                            removeAliens.Add(alien);
-                            break;
-                        }
+                        continue;
+                    }
+
+                    if (projectile.Bounds.IntersectsWith(alien.Bounds))
+                    {
+                        projectile.IsActive = false;
+                        alien.IsActive = false;
+                        alienDestroyed(alien);
+                        break;
                     }
                 }
-                // Colisão: Tiro do Alien -> Player
-                else
+            }
+        }
+
+        private static void ResolveAlienProjectilePlayerCollisions(
+            PlayerShip player,
+            List<Projectile> projectiles,
+            Action playerHit)
+        {
+            foreach (Projectile projectile in projectiles)
+            {
+                if (!projectile.IsActive ||
+                    projectile.Owner != ProjectileOwner.Alien)
                 {
-                    if (projectile.Bounds.IntersectsWith(jogo.Player.Bounds))
-                    {
-                        jogo.Player.LoseLife();
-                        removeProjectiles.Add(projectile);
-                    }
+                    continue;
+                }
+
+                if (projectile.Bounds.IntersectsWith(player.Bounds))
+                {
+                    projectile.IsActive = false;
+                    playerHit();
+                    break;
                 }
             }
         }

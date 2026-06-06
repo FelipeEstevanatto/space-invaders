@@ -73,6 +73,16 @@ namespace SpaceInvaders.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap explosion_gif {
+            get {
+                object obj = ResourceManager.GetObject("explosion_gif", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap nave_png {
             get {
                 object obj = ResourceManager.GetObject("nave_png", resourceCulture);

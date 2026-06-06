@@ -1,38 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Windows.Forms;
+﻿using System.Drawing;
+using SpaceInvaders;
 
 namespace SpaceInvaders
 {
-    internal class Alien
+    public class Alien
     {
-        public const int AlienWidth = 40;
-        public const int AlienHeight = 40;
+        public const int DefaultWidth = 36;
+        public const int DefaultHeight = 24;
 
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public Rectangle Bounds => new Rectangle(X, Y, AlienWidth, AlienHeight);
-        public int VelocidadeX { get; private set; } = 5;
+        public Rectangle Bounds { get; private set; }
+        public bool IsActive { get; set; }
 
         public Alien(int x, int y)
         {
-            X = x;
-            Y = y;
+            Bounds = new Rectangle(x, y, DefaultWidth, DefaultHeight);
+            IsActive = true;
         }
 
-        public void Move()
+        public void Move(int dx, int dy)
         {
-            X += VelocidadeX;
+            Bounds = new Rectangle(
+                Bounds.X + dx,
+                Bounds.Y + dy,
+                Bounds.Width,
+                Bounds.Height);
         }
 
-        public void ReverseDirectionAndDescend()
+        public Projectile CreateProjectile()
         {
-            VelocidadeX = -VelocidadeX;
-            Y += 30;
+            int x = Bounds.X + Bounds.Width / 2 - Projectile.DefaultWidth / 2;
+            int y = Bounds.Bottom;
+
+            return new Projectile(
+                x,
+                y,
+                5,
+                ProjectileOwner.Alien);
+        }
+
+        public void Draw(Graphics graphics)
+        {
+            if (!IsActive)
+            {
+                return;
+            }
+
+            graphics.FillRectangle(Brushes.LimeGreen, Bounds);
+
+            int eyeSize = 4;
+
+            graphics.FillRectangle(
+                Brushes.Black,
+                Bounds.X + 8,
+                Bounds.Y + 7,
+                eyeSize,
+                eyeSize);
+
+            graphics.FillRectangle(
+                Brushes.Black,
+                Bounds.Right - 12,
+                Bounds.Y + 7,
+                eyeSize,
+                eyeSize);
         }
     }
 }

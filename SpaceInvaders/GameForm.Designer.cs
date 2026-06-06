@@ -54,8 +54,6 @@
             this.Name = "GameForm";
             this.Text = "Space Invaders";
             this.Load += new System.EventHandler(this.GameForm_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GameForm_KeyDown);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.GameForm_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.pctShip)).EndInit();
             this.ResumeLayout(false);
 
