@@ -13,6 +13,7 @@ namespace SpaceInvaders
         private readonly List<Alien> aliens;
         private readonly List<Projectile> projectiles;
         public event Action<SoundEffectType> SoundEffectRequested;
+        private readonly List<Explosion> explosions;
 
         private bool initialized;
         private bool movingLeft;
@@ -38,6 +39,7 @@ namespace SpaceInvaders
             random = new Random();
             aliens = new List<Alien>();
             projectiles = new List<Projectile>();
+            explosions = new List<Explosion>();
 
             alienDirection = 1;
             Lives = 3;
@@ -128,6 +130,7 @@ namespace SpaceInvaders
                 OnAlienDestroyed,
                 OnPlayerHit);
 
+            UpdateExplosions();
             RemoveInactiveObjects(viewportSize);
             CheckGameState(viewportSize);
 
@@ -139,6 +142,14 @@ namespace SpaceInvaders
             if (alienShootCooldown > 0)
             {
                 alienShootCooldown--;
+            }
+        }
+
+        private void UpdateExplosions()
+        {
+            foreach (Explosion explosion in explosions)
+            {
+                explosion.Update();
             }
         }
 
@@ -156,6 +167,11 @@ namespace SpaceInvaders
             foreach (Alien alien in aliens)
             {
                 alien.Draw(graphics);
+            }
+
+            foreach (Explosion explosion in explosions)
+            {
+                explosion.Draw(graphics);
             }
 
             foreach (Projectile projectile in projectiles)
@@ -303,6 +319,15 @@ namespace SpaceInvaders
                 projectile.Bounds.Top > viewportSize.Height);
 
             aliens.RemoveAll(alien => !alien.IsActive);
+
+            for (int i = explosions.Count - 1; i >= 0; i--)
+            {
+                if (!explosions[i].IsActive)
+                {
+                    explosions[i].Dispose();
+                    explosions.RemoveAt(i);
+                }
+            }
         }
 
         private void CheckGameState(Size viewportSize)
@@ -326,12 +351,18 @@ namespace SpaceInvaders
         private void OnAlienDestroyed(Alien alien)
         {
             Score += 10;
+
+            explosions.Add(new Explosion(alien.Bounds));
+
             RequestSound(SoundEffectType.AlienDestroyed);
         }
 
         private void OnPlayerHit()
         {
             Lives--;
+
+            // RequestSound(SoundEffectType.PlayerHit);
+            explosions.Add(new Explosion(player.Bounds));
 
             if (Lives <= 0)
             {
@@ -403,6 +434,12 @@ namespace SpaceInvaders
 
             aliens.Clear();
             projectiles.Clear();
+            foreach (Explosion explosion in explosions)
+            {
+                explosion.Dispose();
+            }
+
+            explosions.Clear();
         }
     }
 }

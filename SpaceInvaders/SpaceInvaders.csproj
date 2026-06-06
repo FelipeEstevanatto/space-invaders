@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Alien.cs" />
     <Compile Include="AudioManager.cs" />
+    <Compile Include="Explosion.cs" />
     <Compile Include="GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -93,6 +94,9 @@
     <None Include="Resources\player_ship.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\explosion.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\iceball.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
