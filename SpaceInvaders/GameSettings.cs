@@ -1,4 +1,6 @@
-﻿namespace SpaceInvaders
+﻿using System.Drawing;
+
+namespace SpaceInvaders
 {
     public static class GameSettings
     {
@@ -20,5 +22,21 @@
         public const int InitialAlienShootCooldown = 60;
         public const int AlienShootCooldownMin = 25;
         public const int AlienShootCooldownMax = 90;
+
+        public static readonly Color[] AlienRowColors =
+        {
+            Color.Red,          // row 0: back/top row
+            Color.Orange,
+            Color.Yellow,
+            Color.LimeGreen    // row 3: front/bottom row
+        };
+
+        public static readonly int[] AlienRowPoints =
+        {
+            40,     // row 0: back/top row
+            30,
+            20,
+            10      // row 3: front/bottom row
+        };
     }
 }

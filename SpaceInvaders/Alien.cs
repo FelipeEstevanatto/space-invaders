@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using SpaceInvaders;
+using System.Drawing.Drawing2D;
 
 namespace SpaceInvaders
 {
@@ -7,18 +7,28 @@ namespace SpaceInvaders
     {
         public const int DefaultWidth = 36;
         public const int DefaultHeight = 24;
-        private static readonly Image AlienImage = CreateScaledImage(
-            Properties.Resources.alien_png,
-            DefaultWidth,
-            DefaultHeight
-        );
+
+        private readonly Image image;
+
         public Rectangle Bounds { get; private set; }
         public bool IsActive { get; set; }
 
-        public Alien(int x, int y)
+        public int RowIndex { get; private set; }
+        public int PointValue { get; private set; }
+
+        public Alien(int x, int y, int rowIndex)
         {
+            RowIndex = rowIndex;
+            PointValue = GameSettings.AlienRowPoints[rowIndex];
+
             Bounds = new Rectangle(x, y, DefaultWidth, DefaultHeight);
             IsActive = true;
+
+            image = CreateTintedImage(
+                Properties.Resources.alien_png,
+                GameSettings.AlienRowColors[rowIndex],
+                DefaultWidth,
+                DefaultHeight);
         }
 
         public void Move(int dx, int dy)
@@ -42,11 +52,15 @@ namespace SpaceInvaders
                 ProjectileOwner.Alien);
         }
 
-        private static Bitmap CreateScaledImage(Image source, int width, int height)
+        private static Bitmap CreateTintedImage(
+            Image source,
+            Color color,
+            int width,
+            int height)
         {
-            Bitmap bitmap = new Bitmap(width, height);
+            Bitmap scaledBitmap = new Bitmap(width, height);
 
-            using (Graphics graphics = Graphics.FromImage(bitmap))
+            using (Graphics graphics = Graphics.FromImage(scaledBitmap))
             {
                 graphics.InterpolationMode =
                     System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
@@ -57,7 +71,35 @@ namespace SpaceInvaders
                 graphics.DrawImage(source, 0, 0, width, height);
             }
 
-            return bitmap;
+            Bitmap tintedBitmap = new Bitmap(width, height);
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Color originalPixel = scaledBitmap.GetPixel(x, y);
+
+                    if (originalPixel.A == 0)
+                    {
+                        tintedBitmap.SetPixel(x, y, Color.Transparent);
+                        continue;
+                    }
+
+                    int brightness = (originalPixel.R + originalPixel.G + originalPixel.B) / 3;
+
+                    Color tintedPixel = Color.FromArgb(
+                        originalPixel.A,
+                        color.R * brightness / 255,
+                        color.G * brightness / 255,
+                        color.B * brightness / 255);
+
+                    tintedBitmap.SetPixel(x, y, tintedPixel);
+                }
+            }
+
+            scaledBitmap.Dispose();
+
+            return tintedBitmap;
         }
 
         public void Draw(Graphics graphics)
@@ -67,7 +109,7 @@ namespace SpaceInvaders
                 return;
             }
 
-            graphics.DrawImageUnscaled(AlienImage, Bounds.X, Bounds.Y);
+            graphics.DrawImageUnscaled(image, Bounds.X, Bounds.Y);
         }
     }
 }

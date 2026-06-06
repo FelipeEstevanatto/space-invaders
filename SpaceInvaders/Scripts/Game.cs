@@ -424,7 +424,7 @@ namespace SpaceInvaders
 
         private void OnAlienDestroyed(Alien alien)
         {
-            Score += 10;
+            Score += alien.PointValue;
 
             explosions.Add(new Explosion(alien.Bounds));
 
@@ -499,7 +499,7 @@ namespace SpaceInvaders
                     int x = startX + column * (Alien.DefaultWidth + spacingX);
                     int y = startY + row * (Alien.DefaultHeight + spacingY);
 
-                    aliens.Add(new Alien(x, y));
+                    aliens.Add(new Alien(x, y, row));
                 }
             }
         }
