@@ -11,7 +11,7 @@ namespace SpaceInvaders
         private readonly Image image;
 
         public Rectangle Bounds { get; private set; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; private set; }
 
         public int RowIndex { get; private set; }
         public int PointValue { get; private set; }
@@ -110,6 +110,11 @@ namespace SpaceInvaders
             }
 
             graphics.DrawImageUnscaled(image, Bounds.X, Bounds.Y);
+        }
+
+        public void Destroy()
+        {
+            IsActive = false;
         }
     }
 }

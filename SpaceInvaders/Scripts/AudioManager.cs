@@ -15,8 +15,8 @@ namespace SpaceInvaders
         private bool isMuted;
         private bool isDisposed;
 
-        public double MusicVolume { get; set; } = 0.2;
-        public double EffectsVolume { get; set; } = 0.7;
+        public double MusicVolume { get; private set; } = 0.2;
+        public double EffectsVolume { get; private set; } = 0.7;
 
         public bool IsMuted
         {

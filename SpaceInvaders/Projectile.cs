@@ -17,8 +17,7 @@ namespace SpaceInvaders
 
         public Rectangle Bounds { get; private set; }
         public ProjectileOwner Owner { get; private set; }
-        public bool IsActive { get; set; }
-
+        public bool IsActive { get; private set; }
         public Projectile(int x, int y, int speedY, ProjectileOwner owner)
         {
             this.speedY = speedY;
@@ -49,6 +48,11 @@ namespace SpaceInvaders
                 : Brushes.Red;
 
             graphics.FillRectangle(brush, Bounds);
+        }
+
+        public void Deactivate()
+        {
+            IsActive = false;
         }
     }
 }

@@ -48,8 +48,8 @@ namespace SpaceInvaders
 
                     if (projectile.Bounds.IntersectsWith(alien.Bounds))
                     {
-                        projectile.IsActive = false;
-                        alien.IsActive = false;
+                        projectile.Deactivate();
+                        alien.Destroy();
                         alienDestroyed(alien);
                         break;
                     }
@@ -72,7 +72,7 @@ namespace SpaceInvaders
 
                 if (projectile.Bounds.IntersectsWith(player.Bounds))
                 {
-                    projectile.IsActive = false;
+                    projectile.Deactivate();
                     playerHit();
                     break;
                 }
