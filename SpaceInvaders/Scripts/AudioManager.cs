@@ -54,8 +54,8 @@ namespace SpaceInvaders
 
             Uri uri = GetSoundUri(fileName);
 
-            musicPlayer.Open(uri);
             musicPlayer.Volume = isMuted ? 0 : MusicVolume;
+            musicPlayer.Open(uri);
             musicPlayer.Play();
         }
 
@@ -81,8 +81,8 @@ namespace SpaceInvaders
             MediaPlayer player = pool.Dequeue();
 
             player.Stop();
+            player.Volume = isMuted ? 0 : MusicVolume;
             player.Position = TimeSpan.Zero;
-            player.Volume = EffectsVolume;
             player.Play();
 
             pool.Enqueue(player);
