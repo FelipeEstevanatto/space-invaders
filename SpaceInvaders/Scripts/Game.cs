@@ -7,8 +7,8 @@ namespace SpaceInvaders
 {
     public class Game
     {
+        private int backgroundOffsetY;
         private readonly Random random;
-
         private PlayerShip player;
         private readonly List<Alien> aliens;
         private readonly List<Projectile> projectiles;
@@ -26,6 +26,7 @@ namespace SpaceInvaders
         private int alienDirection;
 
         private bool gameOver;
+        private bool gameWon;
 
         private const int PlayerShootCooldownMax = 15;
         private const int AlienMoveSpeed = 2;
@@ -81,7 +82,7 @@ namespace SpaceInvaders
                 shooting = true;
             }
 
-            if (key == Keys.R && gameOver)
+            if (key == Keys.R && (gameOver || gameWon))
             {
                 Reset();
             }
@@ -112,10 +113,19 @@ namespace SpaceInvaders
                 return;
             }
 
+            backgroundOffsetY += 1;
+
+            if (backgroundOffsetY >= viewportSize.Height)
+            {
+                backgroundOffsetY = 0;
+            }
+
             EnsureInitialized(viewportSize);
 
-            if (gameOver)
+            if (gameOver || gameWon)
             {
+                //UpdateExplosions();
+                RemoveInactiveObjects(viewportSize);
                 return;
             }
 
@@ -154,11 +164,26 @@ namespace SpaceInvaders
             }
         }
 
+        // Moving effect
         private void DrawBackground(Graphics graphics, Size viewportSize)
         {
-            graphics.DrawImage(
-                Properties.Resources.space_background,
-                new Rectangle(0, 0, viewportSize.Width, viewportSize.Height));
+            // graphics.DrawImage(Properties.Resources.space_background, new Rectangle(0, 0, viewportSize.Width, viewportSize.Height));
+            Image background = Properties.Resources.space_background;
+
+            Rectangle first = new Rectangle(
+                0,
+                backgroundOffsetY,
+                viewportSize.Width,
+                viewportSize.Height);
+
+            Rectangle second = new Rectangle(
+                0,
+                backgroundOffsetY - viewportSize.Height,
+                viewportSize.Width,
+                viewportSize.Height);
+
+            graphics.DrawImage(background, first);
+            graphics.DrawImage(background, second);
         }
 
         public void Draw(Graphics graphics, Size viewportSize)
@@ -198,6 +223,33 @@ namespace SpaceInvaders
             if (gameOver)
             {
                 DrawGameOver(graphics, viewportSize);
+            }
+
+            if (gameWon)
+            {
+                DrawWinScreen(graphics, viewportSize);
+            }
+        }
+
+        private void DrawWinScreen(Graphics graphics, Size viewportSize)
+        {
+            string title = "YOU WIN!";
+            string subtitle = "Press R to restart";
+
+            using (Font titleFont = new Font(FontFamily.GenericSansSerif, 28, FontStyle.Bold))
+            using (Font subtitleFont = new Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold))
+            {
+                SizeF titleSize = graphics.MeasureString(title, titleFont);
+                SizeF subtitleSize = graphics.MeasureString(subtitle, subtitleFont);
+
+                float titleX = viewportSize.Width / 2f - titleSize.Width / 2f;
+                float titleY = viewportSize.Height / 2f - titleSize.Height;
+
+                float subtitleX = viewportSize.Width / 2f - subtitleSize.Width / 2f;
+                float subtitleY = titleY + titleSize.Height + 10;
+
+                graphics.DrawString(title, titleFont, Brushes.LimeGreen, titleX, titleY);
+                graphics.DrawString(subtitle, subtitleFont, Brushes.White, subtitleX, subtitleY);
             }
         }
 
@@ -270,7 +322,8 @@ namespace SpaceInvaders
                     continue;
                 }
 
-                int nextX = alien.Bounds.X + AlienMoveSpeed * alienDirection;
+                // int nextX = alien.Bounds.X + AlienMoveSpeed * alienDirection;
+                int nextX = alien.Bounds.X + Math.Min(AlienMoveSpeed + (currentLevel - 1) * 8, 12) * alienDirection;
 
                 if (nextX < 0 || nextX + alien.Bounds.Width > viewportSize.Width)
                 {
@@ -357,6 +410,12 @@ namespace SpaceInvaders
 
             if (aliens.Count == 0)
             {
+                if (currentLevel > 1)
+                {
+                    gameWon = true;
+                    return;
+                }
+
                 currentLevel++;
                 CreateAliens(viewportSize);
                 alienDirection = 1;
@@ -455,6 +514,8 @@ namespace SpaceInvaders
             alienShootCooldown = 60;
             alienDirection = 1;
             gameOver = false;
+            gameWon = false;
+            currentLevel = 1;
             Score = 0;
             Lives = 3;
 
