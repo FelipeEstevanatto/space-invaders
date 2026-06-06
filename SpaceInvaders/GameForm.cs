@@ -54,7 +54,7 @@ namespace SpaceInvaders
 
         private void GameForm_Load(object sender, EventArgs e)
         {
-            return;
+            
         }
 
         private void GameForm_Resize(object sender, EventArgs e)

@@ -153,9 +153,22 @@ namespace SpaceInvaders
             }
         }
 
+        private void DrawBackground(Graphics graphics, Size viewportSize)
+        {
+            graphics.DrawImage(
+                Properties.Resources.space_background,
+                new Rectangle(0, 0, viewportSize.Width, viewportSize.Height));
+        }
+
         public void Draw(Graphics graphics, Size viewportSize)
         {
-            graphics.Clear(Color.Black);
+            DrawBackground(graphics, viewportSize);
+            graphics.InterpolationMode =
+                System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+
+            graphics.PixelOffsetMode =
+                System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            //graphics.Clear(Color.Black);
 
             if (!initialized)
             {
