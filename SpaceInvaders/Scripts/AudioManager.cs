@@ -39,10 +39,10 @@ namespace SpaceInvaders
                 return;
             }
 
-            LoadEffect(SoundEffectType.Shoot, "shoot.wav", 8);
-            LoadEffect(SoundEffectType.AlienDestroyed, "explosion.wav", 8);
-            LoadEffect(SoundEffectType.PlayerHit, "player_hit.wav", 4);
-            LoadEffect(SoundEffectType.GameOver, "explosion.wav", 2);
+            LoadEffect(SoundEffectType.Shoot, "shoot.wav", 4);
+            LoadEffect(SoundEffectType.AlienDestroyed, "explosion.wav", 4);
+            LoadEffect(SoundEffectType.PlayerHit, "player_hit.wav", 2);
+            LoadEffect(SoundEffectType.GameOver, "explosion.wav", 1);
         }
 
         public void PlayMusic(string fileName)
