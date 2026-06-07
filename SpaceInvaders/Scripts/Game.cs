@@ -35,6 +35,9 @@ namespace SpaceInvaders
         public int Score { get; private set; }
         public int Lives { get; private set; }
         private int currentLevel = 1;
+        private readonly Image backgroundImage;
+        private readonly Font hudFont = new Font("Consolas", 9, FontStyle.Bold);
+        private readonly Brush hudBackgroundBrush = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
 
         public Game()
         {
@@ -48,6 +51,7 @@ namespace SpaceInvaders
             Score = 0;
 
             player = new PlayerShip(0, 0);
+            backgroundImage = Properties.Resources.space_background;
         }
 
         private void RequestSound(SoundEffectType effectType)
@@ -167,9 +171,6 @@ namespace SpaceInvaders
         // Moving effect
         private void DrawBackground(Graphics graphics, Size viewportSize)
         {
-            // graphics.DrawImage(Properties.Resources.space_background, new Rectangle(0, 0, viewportSize.Width, viewportSize.Height));
-            Image background = Properties.Resources.space_background;
-
             Rectangle first = new Rectangle(
                 0,
                 backgroundOffsetY,
@@ -182,8 +183,8 @@ namespace SpaceInvaders
                 viewportSize.Width,
                 viewportSize.Height);
 
-            graphics.DrawImage(background, first);
-            graphics.DrawImage(background, second);
+            graphics.DrawImage(backgroundImage, first);
+            graphics.DrawImage(backgroundImage, second);
         }
 
         public void Draw(Graphics graphics, Size viewportSize)
@@ -447,18 +448,10 @@ namespace SpaceInvaders
         private void DrawHud(Graphics graphics)
         {
             Rectangle hudArea = new Rectangle(0, 0, 520, 28);
-
-            using (Brush backgroundBrush = new SolidBrush(Color.FromArgb(150, 0, 0, 0)))
-            {
-                graphics.FillRectangle(backgroundBrush, hudArea);
-            }
+            graphics.FillRectangle(hudBackgroundBrush, hudArea);
 
             string text = $"Score: {Score}    Lives: {Lives}    Level: {currentLevel}    Space: Shoot    A/D or Arrows: Move    R: Restart";
-
-            using (Font font = new Font("Consolas", 9, FontStyle.Bold))
-            {
-                graphics.DrawString(text, font, Brushes.White, 6, 7);
-            }
+            graphics.DrawString(text, hudFont, Brushes.White, 6, 7);
         }
 
         private void DrawGameOver(Graphics graphics, Size viewportSize)

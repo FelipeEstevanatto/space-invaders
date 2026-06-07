@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace SpaceInvaders
@@ -7,6 +8,8 @@ namespace SpaceInvaders
     {
         public const int DefaultWidth = 36;
         public const int DefaultHeight = 24;
+        // Static cache to hold only 4 colors of alien images (one for each row)
+        private static readonly Dictionary<int, Image> rowImageCache = new Dictionary<int, Image>();
 
         private readonly Image image;
 
@@ -24,11 +27,20 @@ namespace SpaceInvaders
             Bounds = new Rectangle(x, y, DefaultWidth, DefaultHeight);
             IsActive = true;
 
-            image = CreateTintedImage(
-                Properties.Resources.alien_png,
-                GameSettings.AlienRowColors[rowIndex],
-                DefaultWidth,
-                DefaultHeight);
+            // 2. CHECK THE CACHE BEFORE GENERATING
+            // If we haven't generated the image for this row yet, generate and save it.
+            if (!rowImageCache.ContainsKey(rowIndex))
+            {
+                rowImageCache[rowIndex] = CreateTintedImage(
+                    Properties.Resources.alien_png,
+                    GameSettings.AlienRowColors[rowIndex],
+                    DefaultWidth,
+                    DefaultHeight);
+            }
+
+            // 3. ASSIGN THE CACHED IMAGE
+            // Now, all 8 aliens in row 0 point to the exact same Red image in memory!
+            image = rowImageCache[rowIndex];
         }
 
         public void Move(int dx, int dy)

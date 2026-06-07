@@ -8,6 +8,7 @@ namespace SpaceInvaders
     {
         public const int DefaultWidth = 80;
         public const int DefaultHeight = 40;
+        private readonly Image shipImage;
 
         private const int Speed = 6;
 
@@ -16,6 +17,7 @@ namespace SpaceInvaders
         public PlayerShip(int x, int y)
         {
             Bounds = new Rectangle(x, y, DefaultWidth, DefaultHeight);
+            shipImage = Properties.Resources.nave_png;
         }
 
         public void MoveLeft()
@@ -77,7 +79,7 @@ namespace SpaceInvaders
 
         public void Draw(Graphics graphics)
         {
-            graphics.DrawImage(Properties.Resources.nave_png, Bounds);
+            graphics.DrawImage(shipImage, Bounds);
         }
     }
 }
