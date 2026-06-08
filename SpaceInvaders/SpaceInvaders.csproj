@@ -49,8 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alien.cs" />
+    <Compile Include="GameRenderer.cs" />
     <Compile Include="GameSettings.cs" />
     <Compile Include="GameState.cs" />
+    <Compile Include="InputController.cs" />
     <Compile Include="Scripts\AudioManager.cs" />
     <Compile Include="Explosion.cs" />
     <Compile Include="GameForm.cs">

@@ -7,8 +7,9 @@ namespace SpaceInvaders
 {
     public partial class GameForm : Form
     {
-        // Declaração dos nossos objetos (Associação)
         private Game game;
+        private GameRenderer renderer;
+        private InputController inputController;
         private AudioManager audioManager;
         private Timer gameTimer;
 
@@ -20,18 +21,14 @@ namespace SpaceInvaders
 
         private bool isGameStarted = false;
 
-
         public GameForm()
         {
             InitializeComponent();
 
-            // Make sure the form is double buffered to reduce flickering
             DoubleBuffered = true;
             KeyPreview = true;
-
             Resize += GameForm_Resize;
 
-            // create new timer
             gameTimer = new Timer();
             gameTimer.Interval = GameSettings.TimerIntervalMs;
             gameTimer.Tick += GameTimer_Tick;
@@ -41,6 +38,7 @@ namespace SpaceInvaders
 
             soundIcon.Visible = false;
         }
+
         private void CreateMainMenu()
         {
             menuPanel = new Panel();
@@ -84,12 +82,10 @@ namespace SpaceInvaders
 
             PositionMenuControls();
         }
+
         private void PositionMenuControls()
         {
-            if (menuPanel == null)
-            {
-                return;
-            }
+            if (menuPanel == null) return;
 
             menuShip.Left = ClientSize.Width / 2 - titleLabel.Width / 2 + 10;
             menuShip.Top = ClientSize.Height / 2 - 130;
@@ -103,25 +99,21 @@ namespace SpaceInvaders
             exitButton.Left = ClientSize.Width / 2 - exitButton.Width / 2;
             exitButton.Top = startButton.Bottom + 15;
         }
+
         private void AudioManager_PlayEffect(SoundEffectType effectType)
         {
-            if (!isGameStarted)
-            {
-                return;
-            }
+            if (!isGameStarted) return;
             audioManager.PlayEffect(effectType);
         }
 
         private void GameForm_Load(object sender, EventArgs e)
         {
-            
         }
 
         private void GameForm_Resize(object sender, EventArgs e)
         {
             if (game != null)
             {
-                // Pass the VirtualSize so the physics and bounds never change
                 game.SetViewPort(Game.VirtualSize); 
             }
             PositionMenuControls();
@@ -130,10 +122,7 @@ namespace SpaceInvaders
 
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-            if (!isGameStarted)
-            {
-                return;
-            }
+            if (!isGameStarted) return;
             game.Update(Game.VirtualSize);
             Invalidate();
         }
@@ -141,11 +130,9 @@ namespace SpaceInvaders
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            if (!isGameStarted)
-            {
-                return;
-            }
-            game.Draw(e.Graphics, ClientSize);
+            
+            if (!isGameStarted || game == null || renderer == null) return;
+            renderer.Render(e.Graphics, game, ClientSize);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -154,20 +141,12 @@ namespace SpaceInvaders
 
             if (!isGameStarted)
             {
-                if (e.KeyCode == Keys.Enter)
-                {
-                    StartButton_Click(this, EventArgs.Empty);
-                }
-
-                if (e.KeyCode == Keys.Escape)
-                {
-                    Close();
-                }
-
+                if (e.KeyCode == Keys.Enter) StartButton_Click(this, EventArgs.Empty);
+                if (e.KeyCode == Keys.Escape) Close();
                 return;
             }
 
-            game.KeyDown(e.KeyCode);
+            inputController.KeyDown(e.KeyCode);
             e.Handled = true;
         }
 
@@ -175,19 +154,15 @@ namespace SpaceInvaders
         {
             base.OnKeyUp(e);
 
-            if (!isGameStarted)
-            {
-                return;
-            }
+            if (!isGameStarted) return;
 
-            game.KeyUp(e.KeyCode);
+            inputController.KeyUp(e.KeyCode);
             e.Handled = true;
         }
 
         protected override bool IsInputKey(Keys keyData)
         {
             Keys key = keyData & Keys.KeyCode;
-
             return key == Keys.Left ||
                 key == Keys.Right ||
                 key == Keys.Space ||
@@ -199,7 +174,6 @@ namespace SpaceInvaders
         private void soundIcon_Click(object sender, EventArgs e)
         {
             bool muted = audioManager.ToggleMute();
-
             soundIcon.BackgroundImage = muted
                 ? Properties.Resources.mute_icon
                 : Properties.Resources.sound_icon;
@@ -209,11 +183,13 @@ namespace SpaceInvaders
         {
             isGameStarted = true;
 
-            game = new Game();
+            inputController = new InputController();
+            game = new Game(inputController);
             game.SetViewPort(ClientSize);
+            renderer = new GameRenderer();
 
             audioManager = new AudioManager();
-            audioManager.SetEffectsVolume(0.05f); // Ajusta o volume dos efeitos sonoros
+            audioManager.SetEffectsVolume(0.05f); 
             game.SoundEffectRequested += AudioManager_PlayEffect;
 
             audioManager.LoadEffects();
@@ -229,6 +205,7 @@ namespace SpaceInvaders
         {
             Close();
         }
+
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             if (gameTimer != null)
