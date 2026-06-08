@@ -6,11 +6,13 @@ namespace SpaceInvaders
     {
         private readonly Image backgroundImage;
         private readonly Font hudFont = new Font("Consolas", 9, FontStyle.Bold);
-        private readonly Brush hudBackgroundBrush = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
+        private readonly Brush hudBackgroundBrush = new SolidBrush(Color.FromArgb(150, 150, 150, 150));
+        private readonly Image heartImage;
 
         public GameRenderer()
         {
             backgroundImage = Properties.Resources.space_background;
+            heartImage = Properties.Resources.red_heart;
         }
 
         public void Render(Graphics graphics, Game game, Size actualViewportSize)
@@ -76,11 +78,30 @@ namespace SpaceInvaders
 
         private void DrawHud(Graphics graphics, Game game)
         {
-            Rectangle hudArea = new Rectangle(0, 0, 520, 28);
+            // Draw the translucent black background bar
+            Rectangle hudArea = new Rectangle(0, 0, 220, 28); // Made slightly wider to fit icons
             graphics.FillRectangle(hudBackgroundBrush, hudArea);
 
-            string text = $"Score: {game.Score}    Lives: {game.Lives}    Level: {game.CurrentLevel}    Space: Shoot    A/D or Arrows: Move    R: Restart";
+            string text = $"Score: {game.Score}    Level: {game.CurrentLevel}";
+            string text2 = $"Space: Shoot    A/D or Arrows: Move";
             graphics.DrawString(text, hudFont, Brushes.White, 6, 7);
+            graphics.DrawString(text2, hudFont, Brushes.White, 6, 480);
+
+            int heartWidth = 16;
+            int heartHeight = 16;
+            int spacing = 4;
+            int startX = 490;
+            int startY = 6;
+
+            graphics.DrawString("Lives:", hudFont, Brushes.White, startX - 60, 7);
+
+            for (int i = 0; i < game.Lives; i++)
+            {
+                // Calculate the X position for this specific heart
+                int currentX = startX + (i * (heartWidth + spacing));
+                
+                graphics.DrawImage(heartImage, currentX, startY, heartWidth, heartHeight);
+            }
         }
 
         private void DrawGameOver(Graphics graphics, Size viewportSize)
