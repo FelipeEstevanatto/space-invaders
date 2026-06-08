@@ -171,17 +171,21 @@ namespace SpaceInvaders
         // Moving effect
         private void DrawBackground(Graphics graphics, Size viewportSize)
         {
+            // Add +2 pixels to the height. Because the top image is drawn second, 
+            // it will perfectly paint over any 1-pixel rounding gaps (in larger screens).
+            int overlapHeight = viewportSize.Height + 2;
+
             Rectangle first = new Rectangle(
                 0,
                 backgroundOffsetY,
                 viewportSize.Width,
-                viewportSize.Height);
+                overlapHeight);
 
             Rectangle second = new Rectangle(
                 0,
                 backgroundOffsetY - viewportSize.Height,
                 viewportSize.Width,
-                viewportSize.Height);
+                overlapHeight);
 
             graphics.DrawImage(backgroundImage, first);
             graphics.DrawImage(backgroundImage, second);
