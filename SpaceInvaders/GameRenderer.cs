@@ -106,43 +106,59 @@ namespace SpaceInvaders
 
         private void DrawGameOver(Graphics graphics, Size viewportSize)
         {
+            // Semi-transparent dark overlay to dim the game behind the text
+            using (Brush overlayBrush = new SolidBrush(Color.FromArgb(180, 0, 0, 0)))
+            {
+                graphics.FillRectangle(overlayBrush, 0, 0, viewportSize.Width, viewportSize.Height);
+            }
+
             string title = "GAME OVER";
             string subtitle = "Press R to restart";
+            string subtitle2 = "Press ESC for Menu";
 
-            using (Font titleFont = new Font(FontFamily.GenericSansSerif, 28, FontStyle.Bold))
-            using (Font subtitleFont = new Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold))
+            using (Font titleFont = new Font("Consolas", 36, FontStyle.Bold))
+            using (Font subtitleFont = new Font("Consolas", 14, FontStyle.Bold))
             {
                 SizeF titleSize = graphics.MeasureString(title, titleFont);
-                SizeF subtitleSize = graphics.MeasureString(subtitle, subtitleFont);
+                SizeF subSize = graphics.MeasureString(subtitle, subtitleFont);
+                SizeF sub2Size = graphics.MeasureString(subtitle2, subtitleFont);
 
                 float titleX = viewportSize.Width / 2f - titleSize.Width / 2f;
                 float titleY = viewportSize.Height / 2f - titleSize.Height;
-                float subtitleX = viewportSize.Width / 2f - subtitleSize.Width / 2f;
-                float subtitleY = titleY + titleSize.Height + 10;
 
                 graphics.DrawString(title, titleFont, Brushes.Red, titleX, titleY);
-                graphics.DrawString(subtitle, subtitleFont, Brushes.White, subtitleX, subtitleY);
+                
+                graphics.DrawString(subtitle, subtitleFont, Brushes.White, viewportSize.Width / 2f - subSize.Width / 2f, titleY + titleSize.Height + 10);
+                graphics.DrawString(subtitle2, subtitleFont, Brushes.White, viewportSize.Width / 2f - sub2Size.Width / 2f, titleY + titleSize.Height + 40);
             }
         }
 
         private void DrawWinScreen(Graphics graphics, Size viewportSize)
         {
+            // Semi-transparent overlay for the win screen
+            using (Brush overlayBrush = new SolidBrush(Color.FromArgb(180, 0, 0, 0)))
+            {
+                graphics.FillRectangle(overlayBrush, 0, 0, viewportSize.Width, viewportSize.Height);
+            }
+
             string title = "YOU WIN!";
             string subtitle = "Press R to restart";
+            string subtitle2 = "Press ESC for Menu";
 
-            using (Font titleFont = new Font(FontFamily.GenericSansSerif, 28, FontStyle.Bold))
-            using (Font subtitleFont = new Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold))
+            using (Font titleFont = new Font("Consolas", 36, FontStyle.Bold))
+            using (Font subtitleFont = new Font("Consolas", 14, FontStyle.Bold))
             {
                 SizeF titleSize = graphics.MeasureString(title, titleFont);
-                SizeF subtitleSize = graphics.MeasureString(subtitle, subtitleFont);
+                SizeF subSize = graphics.MeasureString(subtitle, subtitleFont);
+                SizeF sub2Size = graphics.MeasureString(subtitle2, subtitleFont);
 
                 float titleX = viewportSize.Width / 2f - titleSize.Width / 2f;
                 float titleY = viewportSize.Height / 2f - titleSize.Height;
-                float subtitleX = viewportSize.Width / 2f - subtitleSize.Width / 2f;
-                float subtitleY = titleY + titleSize.Height + 10;
 
                 graphics.DrawString(title, titleFont, Brushes.LimeGreen, titleX, titleY);
-                graphics.DrawString(subtitle, subtitleFont, Brushes.White, subtitleX, subtitleY);
+                
+                graphics.DrawString(subtitle, subtitleFont, Brushes.White, viewportSize.Width / 2f - subSize.Width / 2f, titleY + titleSize.Height + 10);
+                graphics.DrawString(subtitle2, subtitleFont, Brushes.White, viewportSize.Width / 2f - sub2Size.Width / 2f, titleY + titleSize.Height + 40);
             }
         }
     }

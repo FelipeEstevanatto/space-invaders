@@ -287,6 +287,12 @@ namespace SpaceInvaders
         {
             CurrentState = GameState.Playing;
         }
+        public void ReturnToMenu()
+        {
+            Reset();
+            CurrentState = GameState.Menu;
+        }
+        
         private void Reset()
         {
             isInitialized = false;

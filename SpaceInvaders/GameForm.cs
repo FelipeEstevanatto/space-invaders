@@ -149,6 +149,14 @@ namespace SpaceInvaders
                 return;
             }
 
+            if (e.KeyCode == Keys.Escape)
+            {
+                game.ReturnToMenu();// clear everything
+                menuPanel.Visible = true;
+                soundIcon.Visible = false;
+                return;
+            }
+
             inputController.KeyDown(e.KeyCode);
             e.Handled = true;
         }
