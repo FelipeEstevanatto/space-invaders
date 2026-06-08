@@ -106,13 +106,22 @@ namespace SpaceInvaders
 
         private void DrawGameOver(Graphics graphics, Size viewportSize)
         {
-            string text = "GAME OVER - Press R to restart";
-            using (Font font = new Font(FontFamily.GenericSansSerif, 20, FontStyle.Bold))
+            string title = "GAME OVER";
+            string subtitle = "Press R to restart";
+
+            using (Font titleFont = new Font(FontFamily.GenericSansSerif, 28, FontStyle.Bold))
+            using (Font subtitleFont = new Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold))
             {
-                SizeF size = graphics.MeasureString(text, font);
-                float x = viewportSize.Width / 2f - size.Width / 2f;
-                float y = viewportSize.Height / 2f - size.Height / 2f;
-                graphics.DrawString(text, font, Brushes.White, x, y);
+                SizeF titleSize = graphics.MeasureString(title, titleFont);
+                SizeF subtitleSize = graphics.MeasureString(subtitle, subtitleFont);
+
+                float titleX = viewportSize.Width / 2f - titleSize.Width / 2f;
+                float titleY = viewportSize.Height / 2f - titleSize.Height;
+                float subtitleX = viewportSize.Width / 2f - subtitleSize.Width / 2f;
+                float subtitleY = titleY + titleSize.Height + 10;
+
+                graphics.DrawString(title, titleFont, Brushes.Red, titleX, titleY);
+                graphics.DrawString(subtitle, subtitleFont, Brushes.White, subtitleX, subtitleY);
             }
         }
 
