@@ -16,6 +16,7 @@ namespace SpaceInvaders
         private Button startButton;
         private Button exitButton;
         private Label titleLabel;
+        private PictureBox menuShip;
 
         private bool isGameStarted = false;
 
@@ -46,6 +47,12 @@ namespace SpaceInvaders
             menuPanel.Dock = DockStyle.Fill;
             menuPanel.BackColor = Color.Black;
 
+            menuShip = new PictureBox();
+            menuShip.Image = Properties.Resources.nave_png; 
+            menuShip.SizeMode = PictureBoxSizeMode.StretchImage;
+            menuShip.Size = new Size(400, 300);
+            menuShip.BackColor = Color.Transparent;
+
             titleLabel = new Label();
             titleLabel.Text = "SPACE INVADERS";
             titleLabel.ForeColor = Color.LimeGreen;
@@ -70,6 +77,7 @@ namespace SpaceInvaders
             menuPanel.Controls.Add(titleLabel);
             menuPanel.Controls.Add(startButton);
             menuPanel.Controls.Add(exitButton);
+            menuPanel.Controls.Add(menuShip);
 
             Controls.Add(menuPanel);
             menuPanel.BringToFront();
@@ -82,6 +90,9 @@ namespace SpaceInvaders
             {
                 return;
             }
+
+            menuShip.Left = ClientSize.Width / 2 - titleLabel.Width / 2 + 10;
+            menuShip.Top = ClientSize.Height / 2 - 130;
 
             titleLabel.Left = ClientSize.Width / 2 - titleLabel.Width / 2;
             titleLabel.Top = ClientSize.Height / 2 - 130;
