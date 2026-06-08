@@ -4,10 +4,13 @@ namespace SpaceInvaders
 {
     public class GameRenderer
     {
+        private readonly Image heartImage;
         private readonly Image backgroundImage;
         private readonly Font hudFont = new Font("Consolas", 9, FontStyle.Bold);
         private readonly Brush hudBackgroundBrush = new SolidBrush(Color.FromArgb(150, 150, 150, 150));
-        private readonly Image heartImage;
+        private readonly Brush overlayBrush = new SolidBrush(Color.FromArgb(180, 0, 0, 0));
+        private readonly Font titleFont = new Font("Consolas", 36, FontStyle.Bold);
+        private readonly Font subtitleFont = new Font("Consolas", 14, FontStyle.Bold);
 
         public GameRenderer()
         {
@@ -107,10 +110,7 @@ namespace SpaceInvaders
         private void DrawGameOver(Graphics graphics, Size viewportSize)
         {
             // Semi-transparent dark overlay to dim the game behind the text
-            using (Brush overlayBrush = new SolidBrush(Color.FromArgb(180, 0, 0, 0)))
-            {
-                graphics.FillRectangle(overlayBrush, 0, 0, viewportSize.Width, viewportSize.Height);
-            }
+            graphics.FillRectangle(overlayBrush, 0, 0, viewportSize.Width, viewportSize.Height);
 
             string title = "GAME OVER";
             string subtitle = "Press R to restart";
@@ -136,10 +136,7 @@ namespace SpaceInvaders
         private void DrawWinScreen(Graphics graphics, Size viewportSize)
         {
             // Semi-transparent overlay for the win screen
-            using (Brush overlayBrush = new SolidBrush(Color.FromArgb(180, 0, 0, 0)))
-            {
-                graphics.FillRectangle(overlayBrush, 0, 0, viewportSize.Width, viewportSize.Height);
-            }
+            graphics.FillRectangle(overlayBrush, 0, 0, viewportSize.Width, viewportSize.Height);
 
             string title = "YOU WIN!";
             string subtitle = "Press R to restart";
