@@ -35,7 +35,8 @@
             // 
             // soundIcon
             // 
-            this.soundIcon.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.soundIcon.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.soundIcon.BackColor = System.Drawing.Color.Transparent;
             this.soundIcon.BackgroundImage = global::SpaceInvaders.Properties.Resources.sound_icon;
             this.soundIcon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.soundIcon.Location = new System.Drawing.Point(849, 12);
