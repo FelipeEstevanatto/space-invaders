@@ -125,7 +125,7 @@ namespace SpaceInvaders
 
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-            if (game.CurrentState != GameState.Playing) return;
+            if (game.CurrentState == GameState.Menu) return;
             game.Update(Game.VirtualSize);
             Invalidate();
         }
@@ -134,7 +134,7 @@ namespace SpaceInvaders
         {
             base.OnPaint(e);
             
-            if (game.CurrentState != GameState.Playing || game == null || renderer == null) return;
+            if (game == null || renderer == null || game.CurrentState == GameState.Menu) return;
             renderer.Render(e.Graphics, game, ClientSize);
         }
 
@@ -142,7 +142,7 @@ namespace SpaceInvaders
         {
             base.OnKeyDown(e);
 
-            if (game.CurrentState != GameState.Playing)
+            if (game.CurrentState == GameState.Menu)
             {
                 if (e.KeyCode == Keys.Enter) StartButton_Click(this, EventArgs.Empty);
                 if (e.KeyCode == Keys.Escape) Close();
@@ -157,7 +157,7 @@ namespace SpaceInvaders
         {
             base.OnKeyUp(e);
 
-            if (game.CurrentState != GameState.Playing) return;
+            if (game.CurrentState == GameState.Menu) return;
 
             inputController.KeyUp(e.KeyCode);
             e.Handled = true;
