@@ -7,7 +7,7 @@ namespace SpaceInvaders
         public const int TimerIntervalMs = 16; // Aproximadamente 60 FPS
 
         public const int InitialLives = 3;
-        public const int MaxLevel = 2;
+        public const int MaxLevel = 3;
 
         public const int PlayerShootCooldown = 15;
 

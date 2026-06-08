@@ -197,7 +197,9 @@ namespace SpaceInvaders
             Alien shooter = activeAliens[random.Next(activeAliens.Count)];
             projectiles.Add(shooter.CreateProjectile());
 
-            alienShootCooldown = random.Next(GameSettings.AlienShootCooldownMin, GameSettings.AlienShootCooldownMax);
+            int minAlienShootCooldown = Math.Max(0, GameSettings.AlienShootCooldownMin - (currentLevel - 1) * 10);
+
+            alienShootCooldown = random.Next(minAlienShootCooldown, GameSettings.AlienShootCooldownMax);
         }
 
         private void RemoveInactiveObjects(Size viewportSize)
