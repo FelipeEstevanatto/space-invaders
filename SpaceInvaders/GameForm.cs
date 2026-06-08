@@ -50,7 +50,7 @@ namespace SpaceInvaders
             titleLabel.Text = "SPACE INVADERS";
             titleLabel.ForeColor = Color.LimeGreen;
             titleLabel.BackColor = Color.Transparent;
-            titleLabel.Font = new Font("Consolas", 28, FontStyle.Bold);
+            titleLabel.Font = new Font("Consolas", 38, FontStyle.Bold);
             titleLabel.AutoSize = true;
 
             startButton = new Button();

@@ -6,7 +6,7 @@ namespace SpaceInvaders
 {
     public class PlayerShip
     {
-        public const int DefaultWidth = 80;
+        public const int DefaultWidth = 60;
         public const int DefaultHeight = 40;
         private readonly Image shipImage;
 
