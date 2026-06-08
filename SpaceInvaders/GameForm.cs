@@ -47,6 +47,8 @@ namespace SpaceInvaders
             menuPanel = new Panel();
             menuPanel.Dock = DockStyle.Fill;
             menuPanel.BackColor = Color.Black;
+            menuPanel.BackgroundImage = Properties.Resources.space_background; 
+            menuPanel.BackgroundImageLayout = ImageLayout.Stretch;
 
             menuShip = new PictureBox();
             menuShip.Image = Properties.Resources.nave_png; 
