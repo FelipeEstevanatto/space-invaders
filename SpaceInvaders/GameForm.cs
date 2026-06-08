@@ -110,7 +110,8 @@ namespace SpaceInvaders
         {
             if (game != null)
             {
-                game.SetViewPort(ClientSize);
+                // Pass the VirtualSize so the physics and bounds never change
+                game.SetViewPort(Game.VirtualSize); 
             }
             PositionMenuControls();
             Invalidate();
@@ -122,7 +123,7 @@ namespace SpaceInvaders
             {
                 return;
             }
-            game.Update(ClientSize);
+            game.Update(Game.VirtualSize);
             Invalidate();
         }
 

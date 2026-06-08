@@ -27,6 +27,7 @@ namespace SpaceInvaders
 
         private bool gameOver;
         private bool gameWon;
+        public static readonly Size VirtualSize = new Size(910, 501);
 
         private const int PlayerShootCooldownMax = GameSettings.PlayerShootCooldown;
         private const int AlienMoveSpeed = GameSettings.AlienBaseSpeed;
@@ -191,18 +192,24 @@ namespace SpaceInvaders
             graphics.DrawImage(backgroundImage, second);
         }
 
-        public void Draw(Graphics graphics, Size viewportSize)
+        public void Draw(Graphics graphics, Size actualViewportSize)
         {
-            DrawBackground(graphics, viewportSize);
-            graphics.InterpolationMode =
-                System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            // 1. Calculate how much the actual window is stretched compared to the virtual window
+            float scaleX = (float)actualViewportSize.Width / VirtualSize.Width;
+            float scaleY = (float)actualViewportSize.Height / VirtualSize.Height;
 
-            graphics.PixelOffsetMode =
-                System.Drawing.Drawing2D.PixelOffsetMode.Half;
-            //graphics.Clear(Color.Black);
+            // 2. MAGICAL GDI+ METHOD: This stretches everything drawn after this line!
+            graphics.ScaleTransform(scaleX, scaleY);
+
+            // 3. Draw everything as normal, but pass the VirtualSize instead!
+            DrawBackground(graphics, VirtualSize);
+            
+            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 
             if (!isInitialized)
             {
+                graphics.ResetTransform(); // Clean up before returning
                 return;
             }
 
@@ -227,13 +234,16 @@ namespace SpaceInvaders
 
             if (gameOver)
             {
-                DrawGameOver(graphics, viewportSize);
+                DrawGameOver(graphics, VirtualSize);
             }
 
             if (gameWon)
             {
-                DrawWinScreen(graphics, viewportSize);
+                DrawWinScreen(graphics, VirtualSize);
             }
+            
+            // 4. Reset the transform so we don't mess up WinForms native UI drawing
+            graphics.ResetTransform();
         }
 
         private void DrawWinScreen(Graphics graphics, Size viewportSize)
