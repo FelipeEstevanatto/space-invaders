@@ -93,9 +93,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\player_ship.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Resources\explosion.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
