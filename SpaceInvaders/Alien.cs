@@ -6,8 +6,8 @@ namespace SpaceInvaders
 {
     public class Alien
     {
-        public const int DefaultWidth = 36;
-        public const int DefaultHeight = 24;
+        public const int DefaultWidth = 30;
+        public const int DefaultHeight = 30;
         // Static cache to hold only 4 colors of alien images (one for each row)
         private static readonly Dictionary<int, Image> rowImageCache = new Dictionary<int, Image>();
 
@@ -74,12 +74,10 @@ namespace SpaceInvaders
 
             using (Graphics graphics = Graphics.FromImage(scaledBitmap))
             {
-                graphics.InterpolationMode =
+                graphics.InterpolationMode = 
                     System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-
-                graphics.PixelOffsetMode =
+                graphics.PixelOffsetMode = 
                     System.Drawing.Drawing2D.PixelOffsetMode.Half;
-
                 graphics.DrawImage(source, 0, 0, width, height);
             }
 
@@ -91,21 +89,27 @@ namespace SpaceInvaders
                 {
                     Color originalPixel = scaledBitmap.GetPixel(x, y);
 
+                    // 1. Preserve transparency
                     if (originalPixel.A == 0)
                     {
                         tintedBitmap.SetPixel(x, y, Color.Transparent);
                         continue;
                     }
 
+                    // 2. Calculate brightness to detect black/dark pixels
                     int brightness = (originalPixel.R + originalPixel.G + originalPixel.B) / 3;
 
-                    Color tintedPixel = Color.FromArgb(
-                        originalPixel.A,
-                        color.R * brightness / 255,
-                        color.G * brightness / 255,
-                        color.B * brightness / 255);
-
-                    tintedBitmap.SetPixel(x, y, tintedPixel);
+                    // 3. If it's a dark pixel, preserve the original color
+                    // A threshold of 50 safely catches black and very dark gray without catching the white body
+                    if (brightness < 50) 
+                    {
+                        tintedBitmap.SetPixel(x, y, Color.FromArgb(originalPixel.A, originalPixel.R, originalPixel.G, originalPixel.B));
+                    }
+                    // 4. If it's a light pixel, apply the bright row color
+                    else 
+                    {
+                        tintedBitmap.SetPixel(x, y, Color.FromArgb(originalPixel.A, color.R, color.G, color.B));
+                    }
                 }
             }
 
