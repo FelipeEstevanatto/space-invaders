@@ -232,7 +232,7 @@ namespace SpaceInvaders
 
             if (aliens.Count == 0)
             {
-                if (currentLevel > 1)
+                if (currentLevel >= GameSettings.MaxLevel)
                 {
                     CurrentState = GameState.Won;
                     return;
@@ -292,7 +292,7 @@ namespace SpaceInvaders
             Reset();
             CurrentState = GameState.Menu;
         }
-        
+
         private void Reset()
         {
             isInitialized = false;
