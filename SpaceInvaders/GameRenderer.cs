@@ -52,12 +52,12 @@ namespace SpaceInvaders
 
             DrawHud(graphics, game);
 
-            if (game.IsGameOver)
+            if (game.CurrentState == GameState.GameOver)
             {
                 DrawGameOver(graphics, Game.VirtualSize);
             }
 
-            if (game.IsGameWon)
+            if (game.CurrentState == GameState.Won)
             {
                 DrawWinScreen(graphics, Game.VirtualSize);
             }

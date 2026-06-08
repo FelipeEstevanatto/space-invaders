@@ -24,14 +24,10 @@ namespace SpaceInvaders
         private int alienShootCooldown;
         private int alienDirection;
 
-        private bool gameOver;
-        private bool gameWon;
         private int currentLevel = 1;
+        public GameState CurrentState { get; private set; } = GameState.Menu;
 
         public static readonly Size VirtualSize = new Size(910, 501);
-        private const int PlayerShootCooldownMax = GameSettings.PlayerShootCooldown;
-        private const int AlienMoveSpeed = GameSettings.AlienBaseSpeed;
-        private const int AlienDropDistance = GameSettings.AlienDropDistance;
 
         // Exposed Public Properties for the Renderer
         public IReadOnlyList<Alien> Aliens => aliens;
@@ -41,8 +37,6 @@ namespace SpaceInvaders
         public int Score { get; private set; }
         public int Lives { get; private set; }
         public int CurrentLevel => currentLevel;
-        public bool IsGameOver => gameOver;
-        public bool IsGameWon => gameWon;
         public bool IsInitialized => isInitialized;
         public int BackgroundOffsetY => backgroundOffsetY;
 
@@ -79,12 +73,14 @@ namespace SpaceInvaders
         {
             if (viewportSize.Width <= 0 || viewportSize.Height <= 0) return;
 
+            if (CurrentState == GameState.Menu) return;
+
             backgroundOffsetY += 1;
             if (backgroundOffsetY >= viewportSize.Height) backgroundOffsetY = 0;
 
             EnsureInitialized(viewportSize);
 
-            if (gameOver || gameWon)
+            if (CurrentState == GameState.GameOver || CurrentState == GameState.Won)
             {
                 if (input.IsRestarting)
                 {
@@ -144,7 +140,7 @@ namespace SpaceInvaders
             if (shootCooldown > 0) return;
 
             projectiles.Add(player.CreateProjectile());
-            shootCooldown = PlayerShootCooldownMax;
+            shootCooldown = GameSettings.PlayerShootCooldown;
             RequestSound(SoundEffectType.Shoot);
         }
 
@@ -157,11 +153,16 @@ namespace SpaceInvaders
         {
             bool shouldDrop = false;
 
+            int currentAlienSpeed = Math.Min(
+                GameSettings.AlienBaseSpeed + currentLevel, 
+                GameSettings.AlienMaxSpeed
+            );
+
             foreach (Alien alien in aliens)
             {
                 if (!alien.IsActive) continue;
 
-                int nextX = alien.Bounds.X + Math.Min(AlienMoveSpeed + (currentLevel - 1) * 8, 12) * alienDirection;
+                int nextX = alien.Bounds.X + (currentAlienSpeed * alienDirection);
 
                 if (nextX < 0 || nextX + alien.Bounds.Width > viewportSize.Width)
                 {
@@ -173,11 +174,11 @@ namespace SpaceInvaders
             if (shouldDrop)
             {
                 alienDirection *= -1;
-                foreach (Alien alien in aliens) alien.Move(0, AlienDropDistance);
+                foreach (Alien alien in aliens) alien.Move(0, GameSettings.AlienDropDistance);
             }
             else
             {
-                foreach (Alien alien in aliens) alien.Move(AlienMoveSpeed * alienDirection, 0);
+                foreach (Alien alien in aliens) alien.Move(currentAlienSpeed * alienDirection, 0);
             }
         }
 
@@ -224,7 +225,7 @@ namespace SpaceInvaders
             {
                 if (alien.Bounds.Bottom >= player.Bounds.Top)
                 {
-                    gameOver = true;
+                    CurrentState = GameState.GameOver;
                     return;
                 }
             }
@@ -233,7 +234,7 @@ namespace SpaceInvaders
             {
                 if (currentLevel > 1)
                 {
-                    gameWon = true;
+                    CurrentState = GameState.Won;
                     return;
                 }
 
@@ -256,7 +257,7 @@ namespace SpaceInvaders
             RequestSound(SoundEffectType.PlayerHit);
             explosions.Add(new Explosion(player.Bounds));
 
-            if (Lives <= 0) gameOver = true;
+            if (Lives <= 0) CurrentState = GameState.GameOver;
         }
 
         private void CreateAliens(Size viewportSize)
@@ -282,15 +283,17 @@ namespace SpaceInvaders
                 }
             }
         }
-
+        public void StartPlaying()
+        {
+            CurrentState = GameState.Playing;
+        }
         private void Reset()
         {
             isInitialized = false;
             shootCooldown = 0;
             alienShootCooldown = GameSettings.InitialAlienShootCooldown;
             alienDirection = 1;
-            gameOver = false;
-            gameWon = false;
+            CurrentState = GameState.Playing;
             currentLevel = 1;
             Score = 0;
             Lives = GameSettings.InitialLives;

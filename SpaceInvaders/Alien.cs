@@ -27,8 +27,7 @@ namespace SpaceInvaders
             Bounds = new Rectangle(x, y, DefaultWidth, DefaultHeight);
             IsActive = true;
 
-            // 2. CHECK THE CACHE BEFORE GENERATING
-            // If we haven't generated the image for this row yet, generate and save it.
+            // CHECK THE CACHE BEFORE GENERATING
             if (!rowImageCache.ContainsKey(rowIndex))
             {
                 rowImageCache[rowIndex] = CreateTintedImage(
@@ -38,8 +37,7 @@ namespace SpaceInvaders
                     DefaultHeight);
             }
 
-            // 3. ASSIGN THE CACHED IMAGE
-            // Now, all 8 aliens in row 0 point to the exact same Red image in memory!
+            // ASSIGN THE CACHED IMAGE
             image = rowImageCache[rowIndex];
         }
 

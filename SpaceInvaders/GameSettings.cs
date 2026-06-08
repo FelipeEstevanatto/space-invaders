@@ -11,7 +11,7 @@ namespace SpaceInvaders
         public const int PlayerShootCooldown = 15;
 
         public const int AlienBaseSpeed = 2;
-        public const int AlienMaxSpeed = 12;
+        public const int AlienMaxSpeed = 10;
         public const int AlienDropDistance = 18;
 
         public const int AlienRows = 4;

@@ -19,8 +19,6 @@ namespace SpaceInvaders
         private Label titleLabel;
         private PictureBox menuShip;
 
-        private bool isGameStarted = false;
-
         public GameForm()
         {
             InitializeComponent();
@@ -28,6 +26,11 @@ namespace SpaceInvaders
             DoubleBuffered = true;
             KeyPreview = true;
             Resize += GameForm_Resize;
+
+            inputController = new InputController();
+            game = new Game(inputController);
+            game.SetViewPort(ClientSize);
+            renderer = new GameRenderer();
 
             gameTimer = new Timer();
             gameTimer.Interval = GameSettings.TimerIntervalMs;
@@ -102,7 +105,7 @@ namespace SpaceInvaders
 
         private void AudioManager_PlayEffect(SoundEffectType effectType)
         {
-            if (!isGameStarted) return;
+            if (game.CurrentState != GameState.Playing) return;
             audioManager.PlayEffect(effectType);
         }
 
@@ -122,7 +125,7 @@ namespace SpaceInvaders
 
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-            if (!isGameStarted) return;
+            if (game.CurrentState != GameState.Playing) return;
             game.Update(Game.VirtualSize);
             Invalidate();
         }
@@ -131,7 +134,7 @@ namespace SpaceInvaders
         {
             base.OnPaint(e);
             
-            if (!isGameStarted || game == null || renderer == null) return;
+            if (game.CurrentState != GameState.Playing || game == null || renderer == null) return;
             renderer.Render(e.Graphics, game, ClientSize);
         }
 
@@ -139,7 +142,7 @@ namespace SpaceInvaders
         {
             base.OnKeyDown(e);
 
-            if (!isGameStarted)
+            if (game.CurrentState != GameState.Playing)
             {
                 if (e.KeyCode == Keys.Enter) StartButton_Click(this, EventArgs.Empty);
                 if (e.KeyCode == Keys.Escape) Close();
@@ -154,7 +157,7 @@ namespace SpaceInvaders
         {
             base.OnKeyUp(e);
 
-            if (!isGameStarted) return;
+            if (game.CurrentState != GameState.Playing) return;
 
             inputController.KeyUp(e.KeyCode);
             e.Handled = true;
@@ -181,12 +184,7 @@ namespace SpaceInvaders
 
         private void StartButton_Click(object sender, EventArgs e)
         {
-            isGameStarted = true;
-
-            inputController = new InputController();
-            game = new Game(inputController);
-            game.SetViewPort(ClientSize);
-            renderer = new GameRenderer();
+            game.StartPlaying();
 
             audioManager = new AudioManager();
             audioManager.SetEffectsVolume(0.05f); 
