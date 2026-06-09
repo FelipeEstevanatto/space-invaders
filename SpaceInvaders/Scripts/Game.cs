@@ -210,7 +210,7 @@ namespace SpaceInvaders
         private void CreateShields(Size viewportSize)
         {
             shields.Clear();
-            int shieldCount = 3;
+            int shieldCount = GameSettings.ShieldCount;
             
             // Calculate perfect horizontal spacing so they look centered
             int spacing = (viewportSize.Width - (shieldCount * Shield.DefaultWidth)) / (shieldCount + 1);
