@@ -10,10 +10,11 @@ namespace SpaceInvaders
         public const int DefaultHeight = 40;
         private readonly Image shipImage;
 
-        private const int Speed = 6;
+        private const int Speed = GameSettings.PlayerSpeed;
 
         public Rectangle Bounds { get; private set; }
-
+        private int invulnerabilityTimer;
+        public bool IsInvulnerable => invulnerabilityTimer > 0;
         public PlayerShip(int x, int y)
         {
             Bounds = new Rectangle(x, y, DefaultWidth, DefaultHeight);
@@ -37,6 +38,18 @@ namespace SpaceInvaders
                 Bounds.Y,
                 Bounds.Width,
                 Bounds.Height);
+        }
+
+        public void Update()
+        {
+            if (invulnerabilityTimer > 0)
+            {
+                invulnerabilityTimer--;
+            }
+        }
+        public void MakeInvulnerable(int ticks)
+        {
+            invulnerabilityTimer = ticks;
         }
 
         public void ClampToBounds(Size viewportSize)
@@ -79,6 +92,14 @@ namespace SpaceInvaders
 
         public void Draw(Graphics graphics)
         {
+            if (IsInvulnerable)
+            {
+                // This math creates a blink effect by skipping the draw call every 5 frames
+                if ((invulnerabilityTimer / 5) % 2 == 0)
+                {
+                    return; 
+                }
+            }
             graphics.DrawImage(shipImage, Bounds);
         }
     }

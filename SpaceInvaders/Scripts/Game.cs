@@ -92,6 +92,7 @@ namespace SpaceInvaders
             }
 
             HandlePlayerInput(viewportSize);
+            player.Update();
             UpdateAliens(viewportSize);
             UpdateAlienShooting();
             UpdateProjectiles();
@@ -259,7 +260,14 @@ namespace SpaceInvaders
             RequestSound(SoundEffectType.PlayerHit);
             explosions.Add(new Explosion(player.Bounds));
 
-            if (Lives <= 0) CurrentState = GameState.GameOver;
+            if (Lives <= 0) 
+            {
+                CurrentState = GameState.GameOver;
+            }
+            else
+            {
+                player.MakeInvulnerable(90); // 1.5 seconds of invulnerability at 60 FPS
+            }
         }
 
         private void CreateAliens(Size viewportSize)

@@ -62,6 +62,8 @@ namespace SpaceInvaders
             List<Projectile> projectiles,
             Action playerHit)
         {
+            if (player.IsInvulnerable) return;
+            
             foreach (Projectile projectile in projectiles)
             {
                 if (!projectile.IsActive ||
