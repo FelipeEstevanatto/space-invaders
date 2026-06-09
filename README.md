@@ -1,4 +1,5 @@
 # Space Invaders
+<img width="890" height="491" alt="Game preview" src="https://github.com/user-attachments/assets/f6fe0473-d09a-4a77-a427-8bcd0b27963b" />
 
 # 📌 Trabalho Prático – Space Invaders em C# com Windows Forms
 
