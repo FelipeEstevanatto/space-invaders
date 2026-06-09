@@ -31,9 +31,11 @@ namespace SpaceInvaders
 
         private void CreateMenu()
         {
-            menuPanel = new Panel();
+            menuPanel = new DoubleBufferedPanel();
             menuPanel.Dock = DockStyle.Fill;
-            menuPanel.BackColor = Color.Black;
+            
+            menuPanel.BackgroundImage = Properties.Resources.space_background; // Ensure you have a background image in your resources
+            menuPanel.BackgroundImageLayout = ImageLayout.Stretch;
 
             menuShip = new PictureBox();
             menuShip.Image = Properties.Resources.nave_png;
@@ -116,6 +118,17 @@ namespace SpaceInvaders
         public void Hide()
         {
             menuPanel.Visible = false;
+        }
+
+        public class DoubleBufferedPanel : Panel
+        {
+            public DoubleBufferedPanel()
+            {
+                this.DoubleBuffered = true;
+                this.SetStyle(ControlStyles.AllPaintingInWmPaint | 
+                            ControlStyles.OptimizedDoubleBuffer | 
+                            ControlStyles.UserPaint, true);
+            }
         }
     }
 }
