@@ -60,7 +60,6 @@
             this.KeyPreview = true;
             this.Name = "GameForm";
             this.Text = "Space Invaders";
-            this.Load += new System.EventHandler(this.GameForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.soundIcon)).EndInit();
             this.ResumeLayout(false);
 

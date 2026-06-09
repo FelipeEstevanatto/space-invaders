@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Color = System.Drawing.Color;
 
 namespace SpaceInvaders
 {
@@ -11,136 +10,89 @@ namespace SpaceInvaders
         private GameRenderer renderer;
         private InputController inputController;
         private AudioManager audioManager;
+        private MenuManager menuManager; // NEW: Replaces all the UI variables
         private Timer gameTimer;
-
-        private Panel menuPanel;
-        private Button startButton;
-        private Button exitButton;
-        private Label titleLabel;
-        private PictureBox menuShip;
 
         public GameForm()
         {
             InitializeComponent();
 
+            this.AutoSize = false;
+            this.MinimumSize = new Size(910, 501);
+
             DoubleBuffered = true;
             KeyPreview = true;
             Resize += GameForm_Resize;
 
+            // 1. Initialize Core Systems
             inputController = new InputController();
             game = new Game(inputController);
-            game.SetViewPort(ClientSize);
+            game.SetViewPort(Game.VirtualSize);
             renderer = new GameRenderer();
 
+            // 2. Initialize Audio
             audioManager = new AudioManager();
-            audioManager.SetEffectsVolume(0.05f); 
+            audioManager.SetEffectsVolume(0.05f);
             audioManager.LoadEffects();
             game.SoundEffectRequested += AudioManager_PlayEffect;
 
+            // 3. Initialize UI (Clean!)
+            menuManager = new MenuManager(this);
+            menuManager.OnStartClicked += StartGame;
+            menuManager.OnExitClicked += Close;
+            soundIcon.Visible = false;
+
+            // 4. Start Game Loop
             gameTimer = new Timer();
             gameTimer.Interval = GameSettings.TimerIntervalMs;
             gameTimer.Tick += GameTimer_Tick;
             gameTimer.Start();
+        }
 
-            CreateMainMenu();
+        private void StartGame()
+        {
+            game.StartPlaying();
+            audioManager.PlayMusic("keygen.wav");
 
+            menuManager.Hide();
+            soundIcon.Visible = true;
+
+            Focus();
+        }
+
+        private void ReturnToMenu()
+        {
+            game.ReturnToMenu();
+            audioManager.StopMusic();
+
+            menuManager.Show();
             soundIcon.Visible = false;
-        }
-
-        private void CreateMainMenu()
-        {
-            menuPanel = new Panel();
-            menuPanel.Dock = DockStyle.Fill;
-            menuPanel.BackColor = Color.Black;
-            menuPanel.BackgroundImage = Properties.Resources.space_background; 
-            menuPanel.BackgroundImageLayout = ImageLayout.Stretch;
-
-            menuShip = new PictureBox();
-            menuShip.Image = Properties.Resources.nave_png; 
-            menuShip.SizeMode = PictureBoxSizeMode.StretchImage;
-            menuShip.Size = new Size(400, 300);
-            menuShip.BackColor = Color.Transparent;
-
-            titleLabel = new Label();
-            titleLabel.Text = "SPACE INVADERS";
-            titleLabel.ForeColor = Color.LimeGreen;
-            titleLabel.BackColor = Color.Transparent;
-            titleLabel.Font = new Font("Consolas", 38, FontStyle.Bold);
-            titleLabel.AutoSize = true;
-
-            startButton = new Button();
-            startButton.Text = "START";
-            startButton.Font = new Font("Consolas", 14, FontStyle.Bold);
-            startButton.Width = 180;
-            startButton.Height = 45;
-            startButton.Click += StartButton_Click;
-
-            exitButton = new Button();
-            exitButton.Text = "EXIT";
-            exitButton.Font = new Font("Consolas", 14, FontStyle.Bold);
-            exitButton.Width = 180;
-            exitButton.Height = 45;
-            exitButton.Click += ExitButton_Click;
-
-            menuPanel.Controls.Add(titleLabel);
-            menuPanel.Controls.Add(startButton);
-            menuPanel.Controls.Add(exitButton);
-            menuPanel.Controls.Add(menuShip);
-
-            Controls.Add(menuPanel);
-            menuPanel.BringToFront();
-
-            PositionMenuControls();
-        }
-
-        private void PositionMenuControls()
-        {
-            if (menuPanel == null) return;
-
-            menuShip.Left = ClientSize.Width / 2 - titleLabel.Width / 2 + 10;
-            menuShip.Top = ClientSize.Height / 2 - 130;
-
-            titleLabel.Left = ClientSize.Width / 2 - titleLabel.Width / 2;
-            titleLabel.Top = ClientSize.Height / 2 - 130;
-
-            startButton.Left = ClientSize.Width / 2 - startButton.Width / 2;
-            startButton.Top = ClientSize.Height / 2 - 30;
-
-            exitButton.Left = ClientSize.Width / 2 - exitButton.Width / 2;
-            exitButton.Top = startButton.Bottom + 15;
-        }
-
-        private void AudioManager_PlayEffect(SoundEffectType effectType)
-        {
-            if (game.CurrentState != GameState.Playing) return;
-            audioManager.PlayEffect(effectType);
-        }
-
-        private void GameForm_Load(object sender, EventArgs e)
-        {
         }
 
         private void GameForm_Resize(object sender, EventArgs e)
         {
-            if (game != null)
-            {
-                game.SetViewPort(Game.VirtualSize); 
-            }
-            PositionMenuControls();
+            if (game != null) game.SetViewPort(Game.VirtualSize);
+            if (menuManager != null) menuManager.Resize();
             Invalidate();
         }
 
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-            if (game.CurrentState == GameState.Menu) return;
-            game.Update(Game.VirtualSize);
+            if (game.CurrentState == GameState.Menu)
+            {
+                menuManager.UpdateAnimation();
+            }
+            else
+            {
+                game.Update(Game.VirtualSize);
+            }
             Invalidate();
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            
+
             if (game == null || renderer == null || game.CurrentState == GameState.Menu) return;
             renderer.Render(e.Graphics, game, ClientSize);
         }
@@ -151,18 +103,14 @@ namespace SpaceInvaders
 
             if (game.CurrentState == GameState.Menu)
             {
-                if (e.KeyCode == Keys.Enter) StartButton_Click(this, EventArgs.Empty);
+                if (e.KeyCode == Keys.Enter) StartGame();
                 if (e.KeyCode == Keys.Escape) Close();
                 return;
             }
 
             if (e.KeyCode == Keys.Escape)
             {
-                game.ReturnToMenu();// clear everything
-                audioManager.StopMusic();
-                
-                menuPanel.Visible = true;
-                soundIcon.Visible = false;
+                ReturnToMenu();
                 return;
             }
 
@@ -173,7 +121,6 @@ namespace SpaceInvaders
         protected override void OnKeyUp(KeyEventArgs e)
         {
             base.OnKeyUp(e);
-
             if (game.CurrentState == GameState.Menu) return;
 
             inputController.KeyUp(e.KeyCode);
@@ -183,12 +130,9 @@ namespace SpaceInvaders
         protected override bool IsInputKey(Keys keyData)
         {
             Keys key = keyData & Keys.KeyCode;
-            return key == Keys.Left ||
-                key == Keys.Right ||
-                key == Keys.Space ||
-                key == Keys.A ||
-                key == Keys.D ||
-                base.IsInputKey(keyData);
+            return key == Keys.Left || key == Keys.Right || key == Keys.Space ||
+                   key == Keys.A || key == Keys.D || key == Keys.R ||
+                   base.IsInputKey(keyData);
         }
 
         private void soundIcon_Click(object sender, EventArgs e)
@@ -199,21 +143,10 @@ namespace SpaceInvaders
                 : Properties.Resources.sound_icon;
         }
 
-        private void StartButton_Click(object sender, EventArgs e)
+        private void AudioManager_PlayEffect(SoundEffectType effectType)
         {
-            game.StartPlaying();
-
-            audioManager.PlayMusic("keygen.wav");
-
-            menuPanel.Visible = false;
-            soundIcon.Visible = true;
-
-            Focus();
-        }
-
-        private void ExitButton_Click(object sender, EventArgs e)
-        {
-            Close();
+            if (game.CurrentState != GameState.Playing) return;
+            audioManager.PlayEffect(effectType);
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
@@ -224,11 +157,7 @@ namespace SpaceInvaders
                 gameTimer.Dispose();
             }
 
-            if (audioManager != null)
-            {
-                audioManager.Dispose();
-            }
-
+            if (audioManager != null) audioManager.Dispose();
             base.OnFormClosed(e);
         }
     }

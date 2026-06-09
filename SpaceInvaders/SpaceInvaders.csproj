@@ -67,6 +67,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Entities\Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripts\MenuManager.cs" />
     <Compile Include="Scripts\SoundEffectType.cs" />
     <Compile Include="Entities\Shield.cs" />
     <EmbeddedResource Include="GameForm.resx">
