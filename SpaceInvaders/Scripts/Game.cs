@@ -33,6 +33,8 @@ namespace SpaceInvaders
         public IReadOnlyList<Alien> Aliens => aliens;
         public IReadOnlyList<Projectile> Projectiles => projectiles;
         public IReadOnlyList<Explosion> Explosions => explosions;
+        public IReadOnlyList<Shield> Shields => shields;
+        private readonly List<Shield> shields;
         public PlayerShip Player => player;
         public int Score { get; private set; }
         public int Lives { get; private set; }
@@ -47,6 +49,7 @@ namespace SpaceInvaders
             aliens = new List<Alien>();
             projectiles = new List<Projectile>();
             explosions = new List<Explosion>();
+            shields = new List<Shield>();
 
             alienDirection = 1;
             Lives = GameSettings.InitialLives;
@@ -97,7 +100,7 @@ namespace SpaceInvaders
             UpdateAlienShooting();
             UpdateProjectiles();
 
-            CollisionManager.Resolve(player, aliens, projectiles, OnAlienDestroyed, OnPlayerHit);
+            CollisionManager.Resolve(player, aliens, shields, projectiles, OnAlienDestroyed, OnPlayerHit);
 
             UpdateExplosions();
             RemoveInactiveObjects(viewportSize);
@@ -121,6 +124,7 @@ namespace SpaceInvaders
 
             player = new PlayerShip(playerX, playerY);
             CreateAliens(viewportSize);
+            CreateShields(viewportSize);
 
             alienShootCooldown = GameSettings.InitialAlienShootCooldown;
             isInitialized = true;
@@ -203,6 +207,24 @@ namespace SpaceInvaders
             alienShootCooldown = random.Next(minAlienShootCooldown, GameSettings.AlienShootCooldownMax);
         }
 
+        private void CreateShields(Size viewportSize)
+        {
+            shields.Clear();
+            int shieldCount = 3;
+            
+            // Calculate perfect horizontal spacing so they look centered
+            int spacing = (viewportSize.Width - (shieldCount * Shield.DefaultWidth)) / (shieldCount + 1);
+            
+            // Place them exactly 80 pixels above the player's ship
+            int startY = player.Bounds.Top - 80; 
+
+            for (int i = 0; i < shieldCount; i++)
+            {
+                int startX = spacing + i * (Shield.DefaultWidth + spacing);
+                shields.Add(new Shield(startX, startY, 15)); // Give them 15 Health points
+            }
+        }
+
         private void RemoveInactiveObjects(Size viewportSize)
         {
             projectiles.RemoveAll(projectile =>
@@ -220,6 +242,8 @@ namespace SpaceInvaders
                     explosions.RemoveAt(i);
                 }
             }
+
+            shields.RemoveAll(shield => !shield.IsActive);
         }
 
         private void CheckGameState(Size viewportSize)
@@ -300,6 +324,7 @@ namespace SpaceInvaders
         public void ReturnToMenu()
         {
             Reset();
+
             CurrentState = GameState.Menu;
         }
 
@@ -318,6 +343,7 @@ namespace SpaceInvaders
             projectiles.Clear();
             foreach (Explosion explosion in explosions) explosion.Dispose();
             explosions.Clear();
+            shields.Clear();
         }
     }
 }

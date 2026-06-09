@@ -11,6 +11,7 @@ namespace SpaceInvaders
         private readonly Brush overlayBrush = new SolidBrush(Color.FromArgb(180, 0, 0, 0));
         private readonly Font titleFont = new Font("Consolas", 36, FontStyle.Bold);
         private readonly Font subtitleFont = new Font("Consolas", 14, FontStyle.Bold);
+        private readonly Brush shieldBrush = new SolidBrush(Color.LimeGreen);
 
         public GameRenderer()
         {
@@ -51,6 +52,21 @@ namespace SpaceInvaders
             foreach (Projectile projectile in game.Projectiles)
             {
                 projectile.Draw(graphics);
+            }
+
+            foreach (Shield shield in game.Shields)
+            {
+                // Draw the green block
+                graphics.FillRectangle(shieldBrush, shield.Bounds);
+
+                // Draw the health number centered inside the block in black
+                string hpText = shield.Health.ToString();
+                SizeF textSize = graphics.MeasureString(hpText, hudFont);
+                
+                float textX = shield.Bounds.X + (shield.Bounds.Width / 2f) - (textSize.Width / 2f);
+                float textY = shield.Bounds.Y + (shield.Bounds.Height / 2f) - (textSize.Height / 2f);
+                
+                graphics.DrawString(hpText, hudFont, Brushes.Black, textX, textY);
             }
 
             DrawHud(graphics, game);

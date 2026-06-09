@@ -32,6 +32,11 @@ namespace SpaceInvaders
             game.SetViewPort(ClientSize);
             renderer = new GameRenderer();
 
+            audioManager = new AudioManager();
+            audioManager.SetEffectsVolume(0.05f); 
+            audioManager.LoadEffects();
+            game.SoundEffectRequested += AudioManager_PlayEffect;
+
             gameTimer = new Timer();
             gameTimer.Interval = GameSettings.TimerIntervalMs;
             gameTimer.Tick += GameTimer_Tick;
@@ -154,6 +159,8 @@ namespace SpaceInvaders
             if (e.KeyCode == Keys.Escape)
             {
                 game.ReturnToMenu();// clear everything
+                audioManager.StopMusic();
+                
                 menuPanel.Visible = true;
                 soundIcon.Visible = false;
                 return;
@@ -196,11 +203,6 @@ namespace SpaceInvaders
         {
             game.StartPlaying();
 
-            audioManager = new AudioManager();
-            audioManager.SetEffectsVolume(0.05f); 
-            game.SoundEffectRequested += AudioManager_PlayEffect;
-
-            audioManager.LoadEffects();
             audioManager.PlayMusic("keygen.wav");
 
             menuPanel.Visible = false;

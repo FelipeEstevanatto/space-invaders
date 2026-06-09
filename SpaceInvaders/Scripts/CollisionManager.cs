@@ -9,6 +9,7 @@ namespace SpaceInvaders
         public static void Resolve(
             PlayerShip player,
             List<Alien> aliens,
+            List<Shield> shields,
             List<Projectile> projectiles,
             Action<Alien> alienDestroyed,
             Action playerHit)
@@ -23,6 +24,10 @@ namespace SpaceInvaders
                 player,
                 projectiles,
                 playerHit
+            );
+            ResolveProjectileShieldCollisions(
+                shields,
+                projectiles
             );
         }
 
@@ -63,7 +68,7 @@ namespace SpaceInvaders
             Action playerHit)
         {
             if (player.IsInvulnerable) return;
-            
+
             foreach (Projectile projectile in projectiles)
             {
                 if (!projectile.IsActive ||
@@ -77,6 +82,27 @@ namespace SpaceInvaders
                     projectile.Deactivate();
                     playerHit();
                     break;
+                }
+            }
+        }
+        private static void ResolveProjectileShieldCollisions(
+            List<Shield> shields,
+            List<Projectile> projectiles)
+        {
+            foreach (Projectile projectile in projectiles)
+            {
+                if (!projectile.IsActive) continue;
+
+                foreach (Shield shield in shields)
+                {
+                    if (!shield.IsActive) continue;
+
+                    if (projectile.Bounds.IntersectsWith(shield.Bounds))
+                    {
+                        projectile.Deactivate(); // Destroy the bullet
+                        shield.TakeDamage();     // Hurt the shield
+                        break;
+                    }
                 }
             }
         }

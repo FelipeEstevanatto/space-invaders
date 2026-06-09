@@ -105,6 +105,16 @@ namespace SpaceInvaders
             return isMuted;
         }
 
+        public void StopMusic()
+        {
+            if (isDisposed)
+            {
+                return;
+            }
+
+            musicPlayer.Stop();
+        }
+
         public void SetMusicVolume(double volume)
         {
             MusicVolume = ClampVolume(volume);
