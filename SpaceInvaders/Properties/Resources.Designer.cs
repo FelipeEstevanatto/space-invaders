@@ -113,6 +113,16 @@ namespace SpaceInvaders.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap shield_png {
+            get {
+                object obj = ResourceManager.GetObject("shield_png", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap sound_icon {
             get {
                 object obj = ResourceManager.GetObject("sound_icon", resourceCulture);

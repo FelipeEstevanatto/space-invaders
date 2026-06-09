@@ -6,6 +6,7 @@ namespace SpaceInvaders
     {
         private readonly Image heartImage;
         private readonly Image backgroundImage;
+        private readonly Image shieldImage;
         private readonly Font hudFont = new Font("Consolas", 9, FontStyle.Bold);
         private readonly Brush hudBackgroundBrush = new SolidBrush(Color.FromArgb(150, 150, 150, 150));
         private readonly Brush overlayBrush = new SolidBrush(Color.FromArgb(180, 0, 0, 0));
@@ -17,6 +18,7 @@ namespace SpaceInvaders
         {
             backgroundImage = Properties.Resources.space_background;
             heartImage = Properties.Resources.red_heart;
+            shieldImage = Properties.Resources.shield_png;
         }
 
         public void Render(Graphics graphics, Game game, Size actualViewportSize)
@@ -57,7 +59,7 @@ namespace SpaceInvaders
             foreach (Shield shield in game.Shields)
             {
                 // Draw the green block
-                graphics.FillRectangle(shieldBrush, shield.Bounds);
+                graphics.DrawImage(shieldImage, shield.Bounds);
 
                 // Draw the health number centered inside the block in black
                 string hpText = shield.Health.ToString();
@@ -66,7 +68,7 @@ namespace SpaceInvaders
                 float textX = shield.Bounds.X + (shield.Bounds.Width / 2f) - (textSize.Width / 2f);
                 float textY = shield.Bounds.Y + (shield.Bounds.Height / 2f) - (textSize.Height / 2f);
                 
-                graphics.DrawString(hpText, hudFont, Brushes.Black, textX, textY);
+                graphics.DrawString(hpText, hudFont, Brushes.White, textX, textY);
             }
 
             DrawHud(graphics, game);
