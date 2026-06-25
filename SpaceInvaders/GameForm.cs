@@ -32,7 +32,8 @@ namespace SpaceInvaders
 
             // 2. Initialize Audio
             audioManager = new AudioManager();
-            audioManager.SetEffectsVolume(0.05f);
+            audioManager.SetEffectsVolume(0.08f);
+            audioManager.SetMusicVolume(0.2f);
             audioManager.LoadEffects();
             game.SoundEffectRequested += AudioManager_PlayEffect;
 
