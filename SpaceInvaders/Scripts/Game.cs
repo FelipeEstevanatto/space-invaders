@@ -123,6 +123,7 @@ namespace SpaceInvaders
             int playerY = viewportSize.Height - PlayerShip.DefaultHeight - 30;
 
             player = new PlayerShip(playerX, playerY);
+            GameSettings.ValidateLayout(viewportSize);
             CreateAliens(viewportSize);
             CreateShields(viewportSize);
 
@@ -298,7 +299,7 @@ namespace SpaceInvaders
         {
             aliens.Clear();
 
-            const int rows = GameSettings.AlienRows;
+            int rows = GameSettings.EffectiveAlienRows;
             const int columns = GameSettings.AlienColumns;
             const int spacingX = GameSettings.AlienSpacingX;
             const int spacingY = GameSettings.AlienSpacingY;

@@ -8,7 +8,7 @@ namespace SpaceInvaders
     {
         public const int DefaultWidth = 30;
         public const int DefaultHeight = 30;
-        // Static cache to hold only 4 colors of alien images (one for each row)
+        // Static cache keyed by resolved row index (one tinted image per distinct row appearance)
         private static readonly Dictionary<int, Image> rowImageCache = new Dictionary<int, Image>();
 
         private readonly Image image;
@@ -22,23 +22,22 @@ namespace SpaceInvaders
         public Alien(int x, int y, int rowIndex)
         {
             RowIndex = rowIndex;
-            PointValue = GameSettings.AlienRowPoints[rowIndex];
+            int resolvedRowIndex = GameSettings.ResolveAlienRowIndex(rowIndex);
+            PointValue = GameSettings.GetAlienRowPointValue(rowIndex);
 
             Bounds = new Rectangle(x, y, DefaultWidth, DefaultHeight);
             IsActive = true;
 
-            // CHECK THE CACHE BEFORE GENERATING
-            if (!rowImageCache.ContainsKey(rowIndex))
+            if (!rowImageCache.ContainsKey(resolvedRowIndex))
             {
-                rowImageCache[rowIndex] = CreateTintedImage(
+                rowImageCache[resolvedRowIndex] = CreateTintedImage(
                     Properties.Resources.alien_png,
-                    GameSettings.AlienRowColors[rowIndex],
+                    GameSettings.GetAlienRowColor(rowIndex),
                     DefaultWidth,
                     DefaultHeight);
             }
 
-            // ASSIGN THE CACHED IMAGE
-            image = rowImageCache[rowIndex];
+            image = rowImageCache[resolvedRowIndex];
         }
 
         public void Move(int dx, int dy)
